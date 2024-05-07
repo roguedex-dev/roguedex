@@ -153,6 +153,20 @@ function convertPokemonId(pokemonId) {
   }
 }
 
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.type === 'RESET_VARIABLES') {
+    console.log("Received RESET_VARIABLES message")
+    // Reset the variables to their initial state
+    myPokemon = [];
+    currentEnemies = [];
+    lastUpdated = null;
+    timeoutId = null;
+    ignoreIds = [];
+
+    sendResponse({ success: true });
+  }
+});
+
 browser.webRequest.onBeforeRequest.addListener(
   function(details) {
     if (details.method === 'GET') {

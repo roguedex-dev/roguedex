@@ -102,6 +102,14 @@ dragElement(alliesDiv);
 document.body.appendChild(enemiesDiv);
 document.body.appendChild(alliesDiv);
 
+browser.runtime.sendMessage({ type: 'RESET_VARIABLES' }, function(response) {
+  if (response && response.success) {
+    console.log('Variables reset successfully');
+  } else {
+    console.error('Failed to reset variables');
+  }
+});
+
 function createPokemonRow(pokemon) {
 	const row = document.createElement('div');
 	row.style.display = 'grid';
