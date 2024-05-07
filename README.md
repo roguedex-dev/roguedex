@@ -21,6 +21,7 @@ Rogue Dex is a browser extension that connects to Pokerogue and uses PokeAPI to 
 - **Chrome Support:** Ensure the extension works seamlessly on Chrome (currently supports Firefox only).
 - **Continue Button Functionality:** Make sure the extension works with the continue button in addition to new game and load game.
 - **Rework Extension Logic:** Refactor the extension to hook into the game script instead of relying on GET requests for fetching sprites. This will improve stability and avoid flakiness in the extension.
+- **Add IV information** This can be done by snooping into the .json file received from the server at each round, without the need of IV scanner
 
 ## Contribution
 Feel free to contribute to this project by forking the repository, making changes, and submitting pull requests.
