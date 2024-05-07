@@ -1,3 +1,6 @@
+// Determining the correct API to use based on the browser
+const browserAPI = (typeof chrome !== "undefined") ? chrome : browser;
+
 function createDiv() {
 	const mainDiv = document.createElement('div');
 	mainDiv.style.position = 'fixed';
@@ -102,7 +105,7 @@ dragElement(alliesDiv);
 document.body.appendChild(enemiesDiv);
 document.body.appendChild(alliesDiv);
 
-browser.runtime.sendMessage({ type: 'RESET_VARIABLES' }, function(response) {
+browserAPI.runtime.sendMessage({ type: 'RESET_VARIABLES' }, function(response) {
   if (response && response.success) {
     console.log('Variables reset successfully');
   } else {
@@ -151,7 +154,7 @@ function appendPokemonToDiv(pokemon, div) {
 	dragElement(div)
 }
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	console.log("Got message:", message, "from", sender)
   if (message.type === 'UPDATE_ENEMIES_DIV') {
   	console.log("Removing DIV")
