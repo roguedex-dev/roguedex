@@ -1,0 +1,26 @@
+name: Build RogueDex
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create Zip File
+      run: |
+        zip -r roguedex.zip manifest.json content.js background.js
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: roguedex
+        path: roguedex.zip
+          
