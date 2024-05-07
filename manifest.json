@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Rogue Dex",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "https://pokerogue.net/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "roguedex@roguedex"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://pokerogue.net/*"],
+      "js" : ["content.js"]
+    }
+  ]
+}
