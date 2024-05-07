@@ -1,4 +1,4 @@
-const saveDataRegex = /.*\/api\/savedata\/get.*slot=(\d).*$/
+const saveDataRegex = /.*api.*\/savedata\/get.*slot=(\d).*$/
 const pokemonSpriteRegex = /.*\/images\/pokemon\/(.*\/)*?(\d+).*\.json.*$/
 const pokemonBackSpriteRegex = /.*\/images\/pokemon\/back\/(\d+)\.png.*$/
 const updateDivTimeout = 1000
@@ -162,7 +162,8 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     lastUpdated = null;
     timeoutId = null;
     ignoreIds = [];
-
+    saveSlotCount = [false, false, false, false, false]
+    gameStarted = false
     sendResponse({ success: true });
   }
 });
@@ -235,7 +236,7 @@ browser.webRequest.onBeforeRequest.addListener(
     }
   },
   {
-    urls: ['https://pokerogue.net/images/pokemon/*', 'https://pokerogue.net/api/savedata/get*']
+    urls: ['https://pokerogue.net/images/pokemon/*', 'https://api.pokerogue.net/savedata/get*']
   },
   ['blocking']
 );
