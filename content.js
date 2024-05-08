@@ -1,94 +1,87 @@
+// Creates the main wrapper div
 function createDiv() {
-	const mainDiv = document.createElement('div');
-	mainDiv.style.position = 'fixed';
-	mainDiv.style.backgroundColor = 'white';
-	mainDiv.style.padding = '20px';
-	mainDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
-	mainDiv.style.zIndex = '9999';
-	mainDiv.style.width = '500px';
-	mainDiv.style.fontFamily = 'Arial, sans-serif';
-	mainDiv.style.height = 'fit-content';
+  const mainWrapper = document.createElement("div");
+  mainWrapper.className = "main-fixed";
 
-	// Create the table header row
-	const headerRow = document.createElement('div');
-	headerRow.style.display = 'grid';
-	headerRow.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
-	headerRow.style.fontWeight = 'bold';
-	headerRow.style.marginBottom = '10px';
-	headerRow.id = 'headerDiv';
+  // Create the table header row
+  const headerRow = document.createElement("div");
+  headerRow.className = "header-row";
+  headerRow.id = "headerRow";
 
-	const pokemonHeader = document.createElement('div');
-	pokemonHeader.textContent = 'Pokemon';
-	headerRow.appendChild(pokemonHeader);
+  const pokemonHeader = document.createElement("div");
+  pokemonHeader.textContent = "Pokemon";
+  headerRow.appendChild(pokemonHeader);
 
-	const weaknessHeader = document.createElement('div');
-	weaknessHeader.textContent = 'Weakness';
-	headerRow.appendChild(weaknessHeader);
+  const weaknessHeader = document.createElement("div");
+  weaknessHeader.textContent = "Weakness";
+  headerRow.appendChild(weaknessHeader);
 
-	const resistanceHeader = document.createElement('div');
-	resistanceHeader.textContent = 'Resistance';
-	headerRow.appendChild(resistanceHeader);
+  const resistanceHeader = document.createElement("div");
+  resistanceHeader.textContent = "Resistance";
+  headerRow.appendChild(resistanceHeader);
 
-	const immunityHeader = document.createElement('div');
-	immunityHeader.textContent = 'Immunity';
-	headerRow.appendChild(immunityHeader);
+  const immunityHeader = document.createElement("div");
+  immunityHeader.textContent = "Immunity";
+  headerRow.appendChild(immunityHeader);
 
-	mainDiv.appendChild(headerRow);
-	return mainDiv
+  mainWrapper.appendChild(headerRow);
+  return mainWrapper;
 }
 
 function createEnemyDiv() {
-	const enemiesDiv = createDiv();
-	enemiesDiv.id = 'enemiesDiv';
-	enemiesDiv.style.top = '10px';
-	enemiesDiv.style.left = '10px';
-	return enemiesDiv
+	const enemies = document.createElement("div");
+	enemies.className = 'enemy-team'
+  enemies.id = "enemies";
+  const pokemonCards = document.createElement("div");
+  pokemonCards.className = "pokemon-cards"
+  enemies.appendChild(pokemonCards)
+  return enemies;
 }
 
 function createAlliesDiv() {
-	const alliesDiv = createDiv();
-	alliesDiv.id = 'alliesDiv';
-	alliesDiv.style.bottom = '10px';
-	alliesDiv.style.right = '10px';
-	return alliesDiv
+	const allies = document.createElement("div");
+	allies.className = 'allies-team'
+  allies.id = "allies";
+  const pokemonCards = document.createElement("div");
+  pokemonCards.className = "pokemon-cards"
+  allies.appendChild(pokemonCards)
+  return allies;
 }
 
-function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById("headerDiv")) {
-    // if present, the header is where you move the DIV from:
-    document.getElementById("headerDiv").onmousedown = dragMouseDown;
-  } else {
-    // otherwise, move the DIV from anywhere inside the DIV:
-    elmnt.onmousedown = dragMouseDown;
-  }
+// Enables drag-and-drop functionality on an element
+function enableDragElement(elmnt) {
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  const dragStartElement = elmnt;
+
+  // Attach the mousedown event handler
+  dragStartElement.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
     e = e || window.event;
     e.preventDefault();
-    // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
+    document.onmouseup = stopDragging;
+    document.onmousemove = dragElement;
   }
 
-  function elementDrag(e) {
+  // Handles dragging movement
+  function dragElement(e) {
     e = e || window.event;
     e.preventDefault();
-    // calculate the new cursor position:
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
   }
 
-  function closeDragElement() {
-    // stop moving when mouse button is released:
+  // Stops dragging on mouse release
+  function stopDragging() {
     document.onmouseup = null;
     document.onmousemove = null;
   }
@@ -96,80 +89,138 @@ function dragElement(elmnt) {
 
 const enemiesDiv = createEnemyDiv()
 const alliesDiv = createAlliesDiv()
-dragElement(enemiesDiv);
-dragElement(alliesDiv);
+
+enableDragElement(enemiesDiv);
+enableDragElement(alliesDiv);
 
 document.body.appendChild(enemiesDiv);
 document.body.appendChild(alliesDiv);
 
-browser.runtime.sendMessage({ type: 'RESET_VARIABLES' }, function(response) {
-  if (response && response.success) {
-    console.log('Variables reset successfully');
-  } else {
-    console.error('Failed to reset variables');
-  }
-});
+let Types
+(function (Types) {
+	Types[Types["normal"] = 1] = 1;
+	Types[Types["fighting"] = 2] = 2;
+	Types[Types["flying"] = 3] = 3;
+	Types[Types["poison"] = 4] = 4;
+	Types[Types["ground"] = 5] = 5;
+	Types[Types["rock"] = 6] = 6;
+	Types[Types["bug"] = 7] = 7;
+	Types[Types["ghost"] = 8] = 8;
+	Types[Types["steel"] = 9] = 9;
+	Types[Types["fire"] = 10] = 10;
+	Types[Types["water"] = 11] = 11;
+	Types[Types["grass"] = 12] = 12;
+	Types[Types["electric"] = 13] = 13;
+	Types[Types["psychic"] = 14] = 14;
+	Types[Types["ice"] = 15] = 15;
+	Types[Types["dragon"] = 16] = 16;
+	Types[Types["dark"] = 17] = 17;
+	Types[Types["fairy"] = 18] = 18;
+})(Types || (Types = {}));
 
-function createPokemonRow(pokemon) {
-	const row = document.createElement('div');
-	row.style.display = 'grid';
-	row.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr';
-	row.style.marginBottom = '10px';
-	row.style.textAlign = 'center';
-	row.id = pokemon.id;
+let Stat;
+(function (Stat) {
+    Stat[Stat["HP"] = 0] = "HP";
+    Stat[Stat["ATK"] = 1] = "ATK";
+    Stat[Stat["DEF"] = 2] = "DEF";
+    Stat[Stat["SPATK"] = 3] = "SPATK";
+    Stat[Stat["SPDEF"] = 4] = "SPDEF";
+    Stat[Stat["SPD"] = 5] = "SPD";
+})(Stat || (Stat = {}));
+;
 
-	const iconDiv = document.createElement('div');
-	const icon = document.createElement('img');
-	icon.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemon.id + ".png"
-	iconDiv.appendChild(icon);
-	row.appendChild(iconDiv);
-
-	const weaknessesDiv = document.createElement('div');
-	weaknessesDiv.textContent = Array.from(pokemon.info.weaknesses).join(' ');
-	weaknessesDiv.style.paddingLeft = "40px";
-	row.appendChild(weaknessesDiv);
-
-	const resistancesDiv = document.createElement('div');
-	resistancesDiv.textContent = Array.from(pokemon.info.resistances).join(' ');
-	resistancesDiv.style.paddingLeft = "80px";
-	row.appendChild(resistancesDiv);
-
-	const immunitiesDiv = document.createElement('div');
-	immunitiesDiv.textContent = Array.from(pokemon.info.immunities).join(' ');
-	immunitiesDiv.style.paddingLeft = "120px";
-	row.appendChild(immunitiesDiv);
-
-	return row
+function createTooltipDiv(tip) {
+	const tooltip = document.createElement('div')
+	tooltip.classList.add('tooltiptext')
+	tooltip.textContent = tip
+	return tooltip
 }
 
-function appendPokemonToDiv(pokemon, div) {
-	let pokemonRow = div.querySelector('[id="' + pokemon.id + '"]')
-	if (pokemonRow) return
-	console.log("Appending pokemon to div")
-	pokemonRow = createPokemonRow(pokemon)
-	div.appendChild(pokemonRow)
-	dragElement(div)
+// Current values: weaknesses, resistances, immunities
+function createTypeEffectivenessWrapper(effectiveness, types) {
+	const typeEffectivenessWrapper = document.createElement('div')
+	typeEffectivenessWrapper.classList.add(`pokemon-${effectiveness}`);
+	typeEffectivenessWrapper.classList.add('tooltip');
+	let counter = 0;
+	let block = document.createElement('div');
+	typeEffectivenessWrapper.appendChild(block)
+	types.forEach(type => {
+		if (counter % 3 === 0) {
+			block = document.createElement('div');
+			typeEffectivenessWrapper.appendChild(block)
+		}
+    const typeIcon = document.createElement('div');
+    typeIcon.style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')`;
+    typeIcon.className = 'type-icon';
+    block.appendChild(typeIcon)
+    counter += 1;
+  });
+  return typeEffectivenessWrapper
 }
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+function createPokemonCardDiv(pokemon) {
+	const card = document.createElement('div');
+	card.classList.add('pokemon-card');
+
+	const infoRow = document.createElement('div');
+	infoRow.style.display = 'flex';
+
+	const iconWrapper = document.createElement('div');
+  iconWrapper.className = 'pokemon-icon';
+  const icon = document.createElement('img');
+  icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+  iconWrapper.appendChild(icon);
+  infoRow.appendChild(iconWrapper);
+
+  const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
+	weaknessesWrapper.appendChild(createTooltipDiv('Weak to'))
+
+	const resistancesWrapper = createTypeEffectivenessWrapper('resistances', pokemon.typeEffectiveness.resistances)
+	resistancesWrapper.appendChild(createTooltipDiv('Resists'))
+
+	const immunitiesWrapper = createTypeEffectivenessWrapper('immunities', pokemon.typeEffectiveness.immunities)
+	immunitiesWrapper.appendChild(createTooltipDiv('Immune to'))
+
+	infoRow.appendChild(weaknessesWrapper)
+	infoRow.appendChild(resistancesWrapper)
+	infoRow.appendChild(immunitiesWrapper)
+
+	const extraInfoRow = document.createElement('div');
+	extraInfoRow.classList.add('text-base')
+	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
+	const ivsRow = document.createElement('div');
+	ivsRow.classList.add('text-base');
+	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
+	
+	card.appendChild(infoRow)
+	card.appendChild(extraInfoRow)
+	card.appendChild(ivsRow)
+	return card
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	console.log("Got message:", message, "from", sender)
-  if (message.type === 'UPDATE_ENEMIES_DIV') {
-  	console.log("Removing DIV")
-  	document.getElementById('enemiesDiv').remove()
-  	let newEnemiesDiv = createEnemyDiv()
-  	dragElement(newEnemiesDiv)
-  	document.body.appendChild(newEnemiesDiv)
-  	console.log("Appended", newEnemiesDiv)
-    message.pokemon.forEach((pokemon) => {
-    	console.log("Received: ", pokemon)
-  		appendPokemonToDiv(pokemon, newEnemiesDiv)
+	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
+		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
+		let oldDiv = document.getElementById(divId)
+		let oldTop = ''
+		let oldLeft = ''
+		if (oldDiv) {
+			console.log("Removing DIV with id", divId)
+			oldTop = oldDiv.style.top;
+			oldLeft = oldDiv.style.left;
+			oldDiv.remove();
+		}
+		const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
+		enableDragElement(newDiv)
+		newDiv.style.top = oldTop
+		newDiv.style.left = oldLeft
+		document.body.appendChild(newDiv)
+		console.log("Appended", newDiv)
+		message.pokemon.forEach((pokemon) => {
+    	const card = createPokemonCardDiv(pokemon)
+		  document.getElementById(divId).querySelector('.pokemon-cards').appendChild(card);
     })
     sendResponse({ success: true });
-  } else if (message.type === 'UPDATE_ALLIES_DIV') {
-  	message.myPokemon.forEach((pokemon) => {
-  		console.log("Received: ", pokemon)
-  		appendPokemonToDiv(pokemon, alliesDiv)
-  	})
-  	sendResponse({ success: true });
-  }
+	}
 });
