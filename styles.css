@@ -1,0 +1,63 @@
+.main-fixed {
+  position: fixed;
+  padding: 20px;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  width: 500px;
+  height: fit-content;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  color: #000000;
+  background-color: #F8F8F0;
+  border: 3px solid #6a6a6a;
+  box-shadow: 3px 3px 0px #292929;
+  font-family: 'Arial', sans-serif; 
+  color: #303030; 
+  text-align: left; 
+  box-sizing: border-box;
+}
+
+/* Specific Styles for Enemies and Allies */
+#enemies,
+#allies {
+  position: fixed;
+}
+
+#enemies {
+  top: 10px;
+  left: 10px;
+}
+
+#allies {
+  bottom: 10px;
+  right: 10px;
+}
+
+/* Styles for the Header Row */
+.header-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Styles for Pokemon Rows */
+.pokemon-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.pokemon-icon,
+.pokemon-weaknesses,
+.pokemon-resistances,
+.pokemon-immunities {
+  padding-left: 40px; /* Adjust as needed */
+}
+.pokemon-resistances {
+  padding-left: 80px;
+}
+.pokemon-immunities {
+  padding-left: 120px;
+}

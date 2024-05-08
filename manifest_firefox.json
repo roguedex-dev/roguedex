@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+    "name": "Rogue Dex",
+    "version": "1.2",
+    "permissions": [
+      "activeTab",
+      "tabs",
+      "webRequest",
+      "webRequestBlocking",
+      "https://pokerogue.net/*",
+      "https://api.pokerogue.net/*"
+    ],
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "{46029ed0-cb54-4130-8105-fcbbed40adc1}"
+      }
+    },
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": true
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
+        "js" : ["content.js"],
+        "css": ["styles.css"]
+      }
+    ]
+  }
