@@ -55,6 +55,7 @@ function enableDragElement(elmnt) {
 
   function dragMouseDown(e) {
     e = e || window.event;
+    if (e.target.type === 'submit' || e.target.type === 'range') return
     e.preventDefault();
     pos3 = e.clientX;
     pos4 = e.clientY;
@@ -65,6 +66,7 @@ function enableDragElement(elmnt) {
   // Handles dragging movement
   function dragElement(e) {
     e = e || window.event;
+    if (e.target.type === 'submit' || e.target.type === 'range') return
     e.preventDefault();
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
@@ -177,8 +179,30 @@ function createArrowButtonsDiv(divId) {
 	return buttonsDiv
 }
 
-// direction can either be 'up' or 'down'
-// divId can either be 'enemies' or 'allies'
+function createOpacitySliderDiv(divId) {
+	const sliderDiv = document.createElement('div')
+	sliderDiv.classList.add('slider-wrapper')
+
+	const opacityTextDiv = document.createElement('div')
+	opacityTextDiv.classList.add('text-base')
+	opacityTextDiv.textContent = "Opacity:"
+	const slider = document.createElement('input')
+	slider.type = "range"
+	slider.min = "10"
+	slider.max = "100"
+	slider.value = "100"
+	slider.id = `${divId}-slider`
+	sliderDiv.appendChild(opacityTextDiv)
+	sliderDiv.appendChild(slider)
+	sliderDiv.addEventListener('input', changeOpacity)
+	return sliderDiv
+}
+
+function changeOpacity(e) {
+	const divId = e.target.id.split("-")[0]
+	const div = document.getElementById(divId)
+	div.style.opacity = `${e.target.value / 100}`
+}
 
 function changePage(click) {
 	const buttonId = click.target.id
@@ -216,9 +240,11 @@ function changePage(click) {
 	createCardsDiv(divId)
 }
 
-function createPokemonCardDiv(pokemon) {
+function createPokemonCardDiv(divId, pokemon) {
 	const card = document.createElement('div');
 	card.classList.add('pokemon-card');
+
+	const opacitySliderDiv = createOpacitySliderDiv(divId)
 
 	const infoRow = document.createElement('div');
 	infoRow.style.display = 'flex';
@@ -250,26 +276,35 @@ function createPokemonCardDiv(pokemon) {
 	ivsRow.classList.add('text-base');
 	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
 	
+	card.appendChild(opacitySliderDiv)
 	card.appendChild(infoRow)
 	card.appendChild(extraInfoRow)
 	card.appendChild(ivsRow)
 	return card
 }
 
-function createCardsDiv(divId) {
+function createWrapperDiv(divId) {
 	const oldDiv = document.getElementById(divId)
 	let oldTop = ''
 	let oldLeft = ''
+	let oldOpacity = ''
 	if (oldDiv) {
 		console.log("Removing DIV with id", divId)
 		oldTop = oldDiv.style.top;
 		oldLeft = oldDiv.style.left;
+		oldOpacity = oldDiv.style.opacity;
 		oldDiv.remove();
 	}
 	const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
 	enableDragElement(newDiv)
 	newDiv.style.top = oldTop
 	newDiv.style.left = oldLeft
+	newDiv.style.opacity = oldOpacity
+	return newDiv;
+}
+
+function createCardsDiv(divId) {
+	let newDiv = createWrapperDiv(divId)
 	let buttonsDiv = createArrowButtonsDiv(divId)
   newDiv.appendChild(buttonsDiv)
   let pokemon = {}
@@ -281,7 +316,7 @@ function createCardsDiv(divId) {
   }
   const pokemonCards = document.createElement("div");
   pokemonCards.className = "pokemon-cards"
-	const card = createPokemonCardDiv(pokemon)
+	const card = createPokemonCardDiv(divId, pokemon)
 	pokemonCards.appendChild(card);
 	newDiv.appendChild(pokemonCards)
 	document.body.appendChild(newDiv)
