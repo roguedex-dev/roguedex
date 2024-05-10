@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Rogue Dex",
   "version": "2.1",
-  "permissions": ["activeTab", "tabs", "webRequest", "webRequestBlocking"],
+  "permissions": ["activeTab", "tabs", "webRequest"],
   "host_permissions": [
     "https://pokerogue.net/*",
     "https://api.pokerogue.net/*"
