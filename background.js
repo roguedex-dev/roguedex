@@ -563,8 +563,8 @@ browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse)
 browserApi.webRequest.onBeforeRequest.addListener(
   function(details) {
     if (details.method === 'POST') {
-      console.log("POST request detected:", details)
       let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
+      console.log("POST Session data:", sessionData)
       appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), "UPDATE_ENEMIES_DIV")
       appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), "UPDATE_ALLIES_DIV")
     }

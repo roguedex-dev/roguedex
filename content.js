@@ -32,9 +32,6 @@ function createEnemyDiv() {
 	const enemies = document.createElement("div");
 	enemies.className = 'enemy-team'
   enemies.id = "enemies";
-  const pokemonCards = document.createElement("div");
-  pokemonCards.className = "pokemon-cards"
-  enemies.appendChild(pokemonCards)
   return enemies;
 }
 
@@ -42,9 +39,6 @@ function createAlliesDiv() {
 	const allies = document.createElement("div");
 	allies.className = 'allies-team'
   allies.id = "allies";
-  const pokemonCards = document.createElement("div");
-  pokemonCards.className = "pokemon-cards"
-  allies.appendChild(pokemonCards)
   return allies;
 }
 
@@ -158,6 +152,70 @@ function createTypeEffectivenessWrapper(effectiveness, types) {
   return typeEffectivenessWrapper
 }
 
+let currentEnemyPage = 0;
+let currentAllyPage = 0;
+let enemiesPokemon = [];
+let alliesPokemon = [];
+
+function createArrowButtonsDiv(divId) {
+	const buttonsDiv = document.createElement('div')
+	buttonsDiv.classList.add('arrow-button-wrapper')
+	const arrowUpButton = document.createElement('button')
+	const arrowDownButton = document.createElement('button')
+	arrowUpButton.classList.add('text-base')
+	arrowDownButton.classList.add('text-base')
+	arrowUpButton.classList.add('arrow-button')
+	arrowDownButton.classList.add('arrow-button')
+	arrowUpButton.textContent = "↑"
+	arrowDownButton.textContent = "↓"
+	arrowUpButton.id = `${divId}-up`
+	arrowDownButton.id = `${divId}-down`
+	arrowUpButton.addEventListener('click', changePage)
+	arrowDownButton.addEventListener('click', changePage)
+	buttonsDiv.appendChild(arrowUpButton)
+	buttonsDiv.appendChild(arrowDownButton)
+	return buttonsDiv
+}
+
+// direction can either be 'up' or 'down'
+// divId can either be 'enemies' or 'allies'
+
+function changePage(click) {
+	const buttonId = click.target.id
+	const divId = buttonId.split("-")[0]
+	const direction = buttonId.split("-")[1]
+	if (direction === 'up') {
+		if (divId === 'enemies') {
+			if (currentEnemyPage > 0) {
+				currentEnemyPage -= 1
+			} else {
+				currentEnemyPage = enemiesPokemon.length - 1
+			}
+		} else if (divId === 'allies') {
+			if (currentAllyPage > 0) {
+				currentAllyPage -= 1
+			} else {
+				currentAllyPage = alliesPokemon.length - 1
+			}
+		}		
+	} else if (direction === 'down') {
+		if (divId === 'enemies') {
+			if ((currentEnemyPage + 1) < enemiesPokemon.length) {
+				currentEnemyPage += 1
+			} else {
+				currentEnemyPage = 0
+			}
+		} else if (divId === 'allies') {
+			if ((currentAllyPage + 1) < alliesPokemon.length) {
+				currentAllyPage += 1
+			} else {
+				currentAllyPage = 0
+			}
+		}
+	}
+	createCardsDiv(divId)
+}
+
 function createPokemonCardDiv(pokemon) {
 	const card = document.createElement('div');
 	card.classList.add('pokemon-card');
@@ -198,29 +256,52 @@ function createPokemonCardDiv(pokemon) {
 	return card
 }
 
+function createCardsDiv(divId) {
+	const oldDiv = document.getElementById(divId)
+	let oldTop = ''
+	let oldLeft = ''
+	if (oldDiv) {
+		console.log("Removing DIV with id", divId)
+		oldTop = oldDiv.style.top;
+		oldLeft = oldDiv.style.left;
+		oldDiv.remove();
+	}
+	const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
+	enableDragElement(newDiv)
+	newDiv.style.top = oldTop
+	newDiv.style.left = oldLeft
+	let buttonsDiv = createArrowButtonsDiv(divId)
+  newDiv.appendChild(buttonsDiv)
+  let pokemon = {}
+  if (divId === 'enemies') {
+  	pokemon = enemiesPokemon[currentEnemyPage]
+  }
+  else {
+  	pokemon = alliesPokemon[currentAllyPage]
+  }
+  const pokemonCards = document.createElement("div");
+  pokemonCards.className = "pokemon-cards"
+	const card = createPokemonCardDiv(pokemon)
+	pokemonCards.appendChild(card);
+	newDiv.appendChild(pokemonCards)
+	document.body.appendChild(newDiv)
+	console.log("Appended", newDiv)
+	return newDiv
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	console.log("Got message:", message, "from", sender)
 	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
-		let oldDiv = document.getElementById(divId)
-		let oldTop = ''
-		let oldLeft = ''
-		if (oldDiv) {
-			console.log("Removing DIV with id", divId)
-			oldTop = oldDiv.style.top;
-			oldLeft = oldDiv.style.left;
-			oldDiv.remove();
+		if (message.type === 'UPDATE_ENEMIES_DIV') {
+			enemiesPokemon = message.pokemon
+			console.log("Updated enemies pokemon:", enemiesPokemon, "current page:", currentEnemyPage)
 		}
-		const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
-		enableDragElement(newDiv)
-		newDiv.style.top = oldTop
-		newDiv.style.left = oldLeft
-		document.body.appendChild(newDiv)
-		console.log("Appended", newDiv)
-		message.pokemon.forEach((pokemon) => {
-    	const card = createPokemonCardDiv(pokemon)
-		  document.getElementById(divId).querySelector('.pokemon-cards').appendChild(card);
-    })
+		else {
+			alliesPokemon = message.pokemon
+			console.log("Updated allies pokemon:", alliesPokemon, "current page:", currentAllyPage)
+		}
+		createCardsDiv(divId)
     sendResponse({ success: true });
 	}
 });

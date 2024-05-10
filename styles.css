@@ -29,7 +29,6 @@
   border: 2px solid #555;
   border-radius: 8px;
   flex: 0 0 auto;
-  margin-right: 20px;
   display:flex;
   flex-direction: column;
 }
@@ -98,6 +97,13 @@
   font-size: 20px;
   text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
   color: black;
+}
+
+.arrow-button-wrapper {
+  display: grid;
+}
+.arrow-button {
+  font-size: 50px;
 }
 
 .tooltip .tooltiptext {
