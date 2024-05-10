@@ -158,6 +158,7 @@ let currentEnemyPage = 0;
 let currentAllyPage = 0;
 let enemiesPokemon = [];
 let alliesPokemon = [];
+let weather = {};
 
 function createArrowButtonsDiv(divId) {
 	const buttonsDiv = document.createElement('div')
@@ -272,14 +273,25 @@ function createPokemonCardDiv(divId, pokemon) {
 	const extraInfoRow = document.createElement('div');
 	extraInfoRow.classList.add('text-base')
 	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
+	
 	const ivsRow = document.createElement('div');
 	ivsRow.classList.add('text-base');
 	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
 	
+	let weatherRow = undefined
+	if (weather.type && weather.turnsLeft) {
+		weatherRow = document.createElement('div');
+		weatherRow.classList.add('text-base');
+		weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`
+	}
+
 	card.appendChild(opacitySliderDiv)
 	card.appendChild(infoRow)
 	card.appendChild(extraInfoRow)
 	card.appendChild(ivsRow)
+	if (weatherRow) {
+		card.appendChild(weatherRow)
+	}
 	return card
 }
 
@@ -330,12 +342,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
 		if (message.type === 'UPDATE_ENEMIES_DIV') {
 			enemiesPokemon = message.pokemon
-			console.log("Updated enemies pokemon:", enemiesPokemon, "current page:", currentEnemyPage)
 		}
 		else {
 			alliesPokemon = message.pokemon
-			console.log("Updated allies pokemon:", alliesPokemon, "current page:", currentAllyPage)
 		}
+		weather = message.weather;
+		if (weather.turnsLeft === 0) weather.turnsLeft = 'N/A'
 		createCardsDiv(divId)
     sendResponse({ success: true });
 	}

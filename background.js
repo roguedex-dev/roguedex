@@ -343,6 +343,20 @@ let Nature;
     Nature[Nature["QUIRKY"] = 24] = "QUIRKY";
 })(Nature || (Nature = {}));
 
+let WeatherType;
+(function (WeatherType) {
+    WeatherType[WeatherType["NONE"] = 0] = "NONE";
+    WeatherType[WeatherType["SUNNY"] = 1] = "SUNNY";
+    WeatherType[WeatherType["RAIN"] = 2] = "RAIN";
+    WeatherType[WeatherType["SANDSTORM"] = 3] = "SANDSTORM";
+    WeatherType[WeatherType["HAIL"] = 4] = "HAIL";
+    WeatherType[WeatherType["SNOW"] = 5] = "SNOW";
+    WeatherType[WeatherType["FOG"] = 6] = "FOG";
+    WeatherType[WeatherType["HEAVY_RAIN"] = 7] = "HEAVY_RAIN";
+    WeatherType[WeatherType["HARSH_SUN"] = 8] = "HARSH_SUN";
+    WeatherType[WeatherType["STRONG_WINDS"] = 9] = "STRONG_WINDS";
+})(WeatherType || (WeatherType = {}));
+
 function getPokemonSpriteURL(id) {
   // Construct the sprite URL based on the Pokemon ID
   const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
@@ -443,9 +457,9 @@ async function getPokemonTypeEffectiveness(id) {
   return {}
 }
 
-function updateDiv(pokemon, message) {
+function updateDiv(pokemon, weather, message) {
   browserApi.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    browserApi.tabs.sendMessage(tabs[0].id, { type: message, pokemon: pokemon }, (response) => {
+    browserApi.tabs.sendMessage(tabs[0].id, { type: message, pokemon: pokemon, weather: weather }, (response) => {
       if (response && response.success) {
           console.log('Div updated successfully');
       } else {
@@ -528,10 +542,17 @@ function mapPartyToPokemonArray(party) {
 }
 
 // message can be either "UPDATE_ALLIES_DIV" or "UPDATE_ENEMIES_DIV"
-function appendPokemonArrayToDiv(pokemonArray, message) {
+function appendPokemonArrayToDiv(pokemonArray, arena, message) {
   let frontendPokemonArray = []
   pokemonArray.forEach((pokemon) => {
     const pokemonId = convertPokemonId(pokemon.species)
+    let weather = {}
+    if (arena.weather && arena.weather.weatherType) {
+        weather = {
+            'type': WeatherType[arena.weather.weatherType],
+            'turnsLeft': arena.weather.turnsLeft || 0
+        }
+    }
     getPokemonTypeEffectiveness(pokemonId).then((typeEffectiveness) => {
       console.log("Got pokemon", pokemonId, "type effectiveness", typeEffectiveness)
       frontendPokemonArray.push({
@@ -545,7 +566,7 @@ function appendPokemonArrayToDiv(pokemonArray, message) {
         'ability': Abilities[pokemon.abilityIndex],
         'nature': Nature[pokemon.nature]
       })
-      updateDiv(frontendPokemonArray, message)
+      updateDiv(frontendPokemonArray, weather, message)
     })
   })
 }
@@ -555,8 +576,8 @@ browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse)
   if (request.type == 'GET_SAVEDATA') {
     const savedata = request.data
     console.log("Received save data", savedata)
-    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.enemyParty), "UPDATE_ENEMIES_DIV")
-    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.party), "UPDATE_ALLIES_DIV")
+    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.enemyParty), savedata.arena, "UPDATE_ENEMIES_DIV")
+    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.party), savedata.arena, "UPDATE_ALLIES_DIV")
   }
 });
 
@@ -565,8 +586,8 @@ browserApi.webRequest.onBeforeRequest.addListener(
     if (details.method === 'POST') {
       let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
       console.log("POST Session data:", sessionData)
-      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), "UPDATE_ENEMIES_DIV")
-      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), "UPDATE_ALLIES_DIV")
+      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
+      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
     }
   },
   {
