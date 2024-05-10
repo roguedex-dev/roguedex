@@ -21,7 +21,7 @@ Rogue Dex is a browser extension that connects to Pokerogue and uses PokeAPI to 
 Feel free to contribute to this project by forking the repository, making changes, and submitting pull requests.
 
 ## Credits
-[PokeAPI](https://github.com/PokeAPI/pokeapi) for circular type icons
+[PokeAPI](https://github.com/PokeAPI/pokeapi) for type icons and type effectiveness
 
 ## Policy
 No user data is transferred to any external servers by this extension. All the traffic is analyzed on each browser only and there is no server component that acts upon this data.
