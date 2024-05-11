@@ -3,24 +3,32 @@ name: Build RogueDex
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-
-  build:
+  build_chrome:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v3
-    
     - name: Create Zip File
       run: |
-        zip -r roguedex.zip manifest.json content.js background.js
-    
+        mv manifest_chrome.json manifest.json
+        zip -r roguedex.zip *.js *.css *.html manifest.json
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: roguedex
-        path: roguedex.zip
+        name: roguedex_chrome
+        path: roguedex_chrome.zip
           
+  build_firefox:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Zip File
+      run: |
+        mv manifest_firefox.json manifest.json
+        zip -r roguedex.zip *.js *.css *.html manifest.json
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: roguedex_firefox
+        path: roguedex_firefox.zip
