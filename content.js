@@ -321,9 +321,11 @@ function createCardsDiv(divId) {
   newDiv.appendChild(buttonsDiv)
   let pokemon = {}
   if (divId === 'enemies') {
+  	if (currentEnemyPage >= enemiesPokemon.length) currentEnemyPage = enemiesPokemon.length - 1
   	pokemon = enemiesPokemon[currentEnemyPage]
   }
   else {
+  	if (currentAllyPage >= alliesPokemon.length) currentAllyPage = alliesPokemon.length - 1
   	pokemon = alliesPokemon[currentAllyPage]
   }
   const pokemonCards = document.createElement("div");
