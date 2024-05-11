@@ -146,7 +146,7 @@ function createTypeEffectivenessWrapper(effectiveness, types) {
 			typeEffectivenessWrapper.appendChild(block)
 		}
     const typeIcon = document.createElement('div');
-    typeIcon.style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')`;
+    typeIcon.style.backgroundImage = `url('${chrome.runtime.getURL(`/type-icons/type-icon${Types[type]}.png`)}')`;
     typeIcon.className = 'type-icon';
     block.appendChild(typeIcon)
     counter += 1;
@@ -222,7 +222,7 @@ function changePage(click) {
 			} else {
 				currentAllyPage = alliesPokemon.length - 1
 			}
-		}		
+		}
 	} else if (direction === 'down') {
 		if (divId === 'enemies') {
 			if ((currentEnemyPage + 1) < enemiesPokemon.length) {
@@ -273,11 +273,11 @@ function createPokemonCardDiv(divId, pokemon) {
 	const extraInfoRow = document.createElement('div');
 	extraInfoRow.classList.add('text-base')
 	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
-	
+
 	const ivsRow = document.createElement('div');
 	ivsRow.classList.add('text-base');
 	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
-	
+
 	let weatherRow = undefined
 	if (weather.type && weather.turnsLeft) {
 		weatherRow = document.createElement('div');

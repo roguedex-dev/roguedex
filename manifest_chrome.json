@@ -27,5 +27,5 @@
       "css": ["styles.css"]
     }
   ],
-  "web_accessible_resources": ["inject.js", "injected.js"]
+  "web_accessible_resources": ["inject.js", "injected.js", "type-icons/*.png"]
 }
