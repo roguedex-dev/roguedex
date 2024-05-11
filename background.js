@@ -584,10 +584,14 @@ browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse)
 browserApi.webRequest.onBeforeRequest.addListener(
   function(details) {
     if (details.method === 'POST') {
-      let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
-      console.log("POST Session data:", sessionData)
-      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
-      appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
+        try {
+          let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
+          console.log("POST Session data:", sessionData)
+          appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
+          appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
+        } catch (e) {
+            console.error("Error while intercepting web request: ", e)
+        }
     }
   },
   {
