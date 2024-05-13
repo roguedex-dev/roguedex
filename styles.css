@@ -65,6 +65,7 @@
   min-width: 45px;
   display: flex;
   min-height: 90px;
+  justify-content: center;
 }
 
 .pokemon-weaknesses {
