@@ -4,9 +4,7 @@
   "version": "2.4",
   "permissions": [
     "activeTab",
-    "tabs",
     "webRequest",
-    "webRequestBlocking",
     "https://pokerogue.net/*",
     "https://api.pokerogue.net/*"
   ],
