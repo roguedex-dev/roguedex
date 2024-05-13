@@ -1,8 +1,12 @@
+:root {
+  --font-size: min(3vh, 2vw);
+  --icon-size: min(10vh, 6vw);
+}
+
 .allies-team {
   margin: 0 auto;
-  padding: 20px;
   position: absolute;
-  max-height: 165px;
+  top: 0
   bottom: 0;
   right: 0;
   z-index: 1;
@@ -34,8 +38,8 @@
 }
 
 .pokemon-icon img {
-  width: 80px;
-  height: 80px;
+  width: min(var(--icon-size), 100px);
+  height: min(var(--icon-size), 100px);
 }
 
 .pokemon-info {
@@ -49,12 +53,14 @@
 }
 
 .type-icon {
-  width: 30px;
-  height: 30px;
+  --width: min(calc(var(--icon-size) / 2), 30px);
+  --height: min(calc(var(--icon-size) / 2), 30px);
+  width: var(--width);
+  height: var(--height);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: left;
-  background-position-x: -1.15px;
+  background-position-x: min(-0.03em, -1.15px);
   border-radius: 50%;
   margin: 0 5px;
 }
@@ -62,9 +68,8 @@
 .pokemon-weaknesses,
 .pokemon-resistances,
 .pokemon-immunities {
-  min-width: 45px;
+  min-width: min(calc(var(--icon-size) / 2 + 1vh), 30px);
   display: flex;
-  min-height: 90px;
   justify-content: center;
 }
 
@@ -95,7 +100,7 @@
 .text-base {
   display: flex;
   font-family: 'emerald';
-  font-size: 20px;
+  font-size: min(var(--font-size), 18px);
   text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
   color: black;
 }
@@ -104,20 +109,17 @@
   display: grid;
 }
 .arrow-button {
-  font-size: 50px;
+  font-size: min(8vh, 45px)
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
-  font-family: 'emerald';
   text-align: center;
   border-radius: 6px;
   padding: 5px 0;
-  font-size: 20px;
+  font-size: var(--font-size);
   position: absolute;
   z-index: 1;
-  color: black;
-  text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
 }
 
 .tooltip:hover .tooltiptext {
@@ -128,23 +130,23 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input[type='range'] {
       overflow: hidden;
-      width: 80px;
+      width: 20vh;
       -webkit-appearance: none;
     }
     
     input[type='range']::-webkit-slider-runnable-track {
-      height: 10px;
+      height: 1vh;
       -webkit-appearance: none;
       color: #13bba4;
       margin-top: -1px;
     }
     
     input[type='range']::-webkit-slider-thumb {
-      width: 10px;
+      width: 1vh;
       -webkit-appearance: none;
-      height: 10px;
+      height: 1vh;
       cursor: ew-resize;
-      box-shadow: -80px 0 0 80px #b3462c;
+      box-shadow: -8vh 0 0 8vh #b3462c;
     }
 
 }

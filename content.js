@@ -127,6 +127,7 @@ let Stat;
 
 function createTooltipDiv(tip) {
 	const tooltip = document.createElement('div')
+	tooltip.classList.add('text-base')
 	tooltip.classList.add('tooltiptext')
 	tooltip.textContent = tip
 	return tooltip
