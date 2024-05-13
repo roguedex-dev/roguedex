@@ -437,6 +437,11 @@ async function calculateTypeEffectiveness(types) {
     // Calculate immunities
     type1Effectiveness.no_damage_from.forEach(t => immunities.add(t.name))
     type2Effectiveness.no_damage_from.forEach(t => immunities.add(t.name))
+
+    immunities.forEach(immunity => {
+        weaknesses.delete(immunity);
+        resistances.delete(immunity);
+    })
   }
 
   return { weaknesses, resistances, immunities };
