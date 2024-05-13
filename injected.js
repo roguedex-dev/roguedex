@@ -1,3 +1,5 @@
+// This is a hack because in background.js we cannot read web request response's body.
+// When we need to do that, we intercept the web request here, and send a message to background.js with the response data, elaborate there and send back to content.js
 (function (xhr) {
 
     var XHR = XMLHttpRequest.prototype;

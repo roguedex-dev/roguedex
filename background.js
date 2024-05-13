@@ -587,6 +587,7 @@ browserApi.webRequest.onBeforeRequest.addListener(
         try {
           let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
           console.log("POST Session data:", sessionData)
+          if (details.url.includes("updateall")) sessionData = sessionData.session
           appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
           appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
         } catch (e) {
@@ -595,7 +596,7 @@ browserApi.webRequest.onBeforeRequest.addListener(
     }
   },
   {
-    urls: ['https://api.pokerogue.net/savedata/update?datatype=1*']
+    urls: ['https://api.pokerogue.net/savedata/update?datatype=1*', 'https://api.pokerogue.net/savedata/updateall']
   },
   ["requestBody"]
 )
