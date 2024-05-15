@@ -252,13 +252,13 @@ function createPokemonCardDiv(divId, pokemon) {
 	infoRow.style.display = 'flex';
 
 	const iconWrapper = document.createElement('div');
-  iconWrapper.className = 'pokemon-icon';
-  const icon = document.createElement('img');
-  icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-  iconWrapper.appendChild(icon);
-  infoRow.appendChild(iconWrapper);
+  	iconWrapper.className = 'pokemon-icon';
+  	const icon = document.createElement('img');
+  	icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+  	iconWrapper.appendChild(icon);
+  	infoRow.appendChild(iconWrapper);
 
-  const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
+  	const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
 	weaknessesWrapper.appendChild(createTooltipDiv('Weak to'))
 
 	const resistancesWrapper = createTypeEffectivenessWrapper('resistances', pokemon.typeEffectiveness.resistances)
@@ -271,13 +271,19 @@ function createPokemonCardDiv(divId, pokemon) {
 	infoRow.appendChild(resistancesWrapper)
 	infoRow.appendChild(immunitiesWrapper)
 
+	const infoTextWrapper = document.createElement('div');
+	infoTextWrapper.classList.add('info-text-wrapper')
+
 	const extraInfoRow = document.createElement('div');
 	extraInfoRow.classList.add('text-base')
 	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
 	
-	const ivsRow = document.createElement('div');
-	ivsRow.classList.add('text-base');
-	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
+	const ivsRowFirst = document.createElement('div');
+	ivsRowFirst.classList.add('text-base');
+	ivsRowFirst.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}`;
+	const ivsRowSecond = document.createElement('div');
+	ivsRowSecond.classList.add('text-base');
+	ivsRowSecond.textContent = `SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
 	
 	let weatherRow = undefined
 	if (weather.type && weather.turnsLeft) {
@@ -286,13 +292,17 @@ function createPokemonCardDiv(divId, pokemon) {
 		weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`
 	}
 
+	infoTextWrapper.appendChild(extraInfoRow)
+	infoTextWrapper.appendChild(ivsRowFirst)
+	infoTextWrapper.appendChild(ivsRowSecond)
+	if (weatherRow) {
+		infoTextWrapper.appendChild(weatherRow)
+	}
+
 	card.appendChild(opacitySliderDiv)
 	card.appendChild(infoRow)
-	card.appendChild(extraInfoRow)
-	card.appendChild(ivsRow)
-	if (weatherRow) {
-		card.appendChild(weatherRow)
-	}
+	card.appendChild(infoTextWrapper)
+	
 	return card
 }
 
