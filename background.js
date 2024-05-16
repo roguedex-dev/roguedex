@@ -388,14 +388,13 @@ async function getTypeEffectiveness(type) {
   }
 }
 // i don't know how to do javascript please fix this if it's broken
-// it's supposed to get the pokemon's ability based on its index
+// gets ability from pokeapi using the pokemon's ability index
 async function getAbility(pokeID, abilityIndex)
 {
     try {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeID}`);
     const data = await response.json();
-    const ability = data.abilities.map(ability => ability.ability.name);
-    return ability;
+    return data.abilities[abilityIndex].ability.name;
   } catch (error) {
     console.error('Error fetching Pokémons ability:', error);
     return null;
@@ -564,7 +563,9 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
   let frontendPokemonArray = []
   pokemonArray.forEach((pokemon) => {
     const pokemonId = convertPokemonId(pokemon.species)
-    const ability = getAbility(pokemonId, pokemon.abilityIndex)
+    let ability = getAbility(pokemonId, pokemon.abilityIndex).then((value) => {
+ 	ability = value
+})
     let weather = {}
     if (arena.weather && arena.weather.weatherType) {
         weather = {
@@ -574,7 +575,7 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
     }
     getPokemonTypeEffectiveness(pokemonId).then((typeEffectiveness) => {
       
-      console.log("Got pokemon", pokemonId, "type effectiveness", typeEffectiveness)
+      console.log("Got pokemon", pokemonId, "ability", ability, "type effectiveness", typeEffectiveness)
       frontendPokemonArray.push({
         'id': pokemon.species,
         'typeEffectiveness': {
