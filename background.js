@@ -398,7 +398,7 @@ async function getAbility(pokeID, abilityIndex)
     const ability = data.abilities.map(ability => ability.ability.name);
     return ability;
   } catch (error) {
-    console.error('Error fetching Pokémon's ability:', error);
+    console.error('Error fetching Pokémons ability:', error);
     return null;
   }
 }
