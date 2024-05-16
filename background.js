@@ -387,7 +387,20 @@ async function getTypeEffectiveness(type) {
     return null;
   }
 }
-
+// i don't know how to do javascript please fix this if it's broken
+// it's supposed to get the pokemon's ability based on its index
+async function getAbility(pokeID, abilityIndex)
+{
+    try {
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeID}`);
+    const data = await response.json();
+    const ability = data.abilities.map(ability => ability.ability.name);
+    return ability;
+  } catch (error) {
+    console.error('Error fetching Pokémon's ability:', error);
+    return null;
+  }
+}
 // Function to calculate weaknesses, resistances, and immunities
 async function calculateTypeEffectiveness(types) {
   const typeEffectiveness = await Promise.all(types.map(getTypeEffectiveness));
@@ -551,6 +564,7 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
   let frontendPokemonArray = []
   pokemonArray.forEach((pokemon) => {
     const pokemonId = convertPokemonId(pokemon.species)
+    const ability = getAbility(pokemonId, pokemon.abilityIndex)
     let weather = {}
     if (arena.weather && arena.weather.weatherType) {
         weather = {
@@ -559,6 +573,7 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
         }
     }
     getPokemonTypeEffectiveness(pokemonId).then((typeEffectiveness) => {
+      
       console.log("Got pokemon", pokemonId, "type effectiveness", typeEffectiveness)
       frontendPokemonArray.push({
         'id': pokemon.species,
@@ -568,7 +583,7 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
           'immunities': Array.from(typeEffectiveness.immunities)
         },
         'ivs': pokemon.ivs,
-        'ability': Abilities[pokemon.abilityIndex],
+        'ability': ability,
         'nature': Nature[pokemon.nature]
       })
       updateDiv(frontendPokemonArray, weather, message)
