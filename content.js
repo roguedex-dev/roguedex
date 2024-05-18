@@ -4,6 +4,19 @@ runningStatusDiv.classList.add('text-base')
 runningStatusDiv.classList.add('running-status')
 document.body.insertBefore(runningStatusDiv, document.body.firstChild)
 
+let wrapperDivPositions = {
+	'enemies': {
+		'top' : '0',
+		'left': '0',
+		'opacity': '100'
+	},
+	'allies': {
+		'top': '0',
+		'left': '0',
+		'opacity': '100'
+	}
+}
+
 let slotId = -1
 const saveKey = 'x0i2O7WRiANTqPmZ'
 // Creates the main wrapper div
@@ -189,10 +202,9 @@ function createArrowButtonsDiv(divId) {
 	return buttonsDiv
 }
 
-function createOpacitySliderDiv(divId) {
+function createOpacitySliderDiv(divId, initialValue = "100") {
 	const sliderDiv = document.createElement('div')
 	sliderDiv.classList.add('slider-wrapper')
-
 	const opacityTextDiv = document.createElement('div')
 	opacityTextDiv.classList.add('text-base')
 	opacityTextDiv.textContent = "Opacity:"
@@ -200,7 +212,7 @@ function createOpacitySliderDiv(divId) {
 	slider.type = "range"
 	slider.min = "10"
 	slider.max = "100"
-	slider.value = "100"
+	slider.value = initialValue
 	slider.id = `${divId}-slider`
 	sliderDiv.appendChild(opacityTextDiv)
 	sliderDiv.appendChild(slider)
@@ -211,6 +223,7 @@ function createOpacitySliderDiv(divId) {
 function changeOpacity(e) {
 	const divId = e.target.id.split("-")[0]
 	const div = document.getElementById(divId)
+	wrapperDivPositions[divId].opacity = e.target.value
 	div.style.opacity = `${e.target.value / 100}`
 }
 
@@ -254,7 +267,7 @@ function createPokemonCardDiv(divId, pokemon) {
 	const card = document.createElement('div');
 	card.classList.add('pokemon-card');
 
-	const opacitySliderDiv = createOpacitySliderDiv(divId)
+	const opacitySliderDiv = createOpacitySliderDiv(divId, wrapperDivPositions[divId].opacity)
 
 	const infoRow = document.createElement('div');
 	infoRow.style.display = 'flex';
@@ -306,20 +319,16 @@ function createPokemonCardDiv(divId, pokemon) {
 
 function createWrapperDiv(divId) {
 	const oldDiv = document.getElementById(divId)
-	let oldTop = ''
-	let oldLeft = ''
-	let oldOpacity = ''
 	if (oldDiv) {
-		oldTop = oldDiv.style.top;
-		oldLeft = oldDiv.style.left;
-		oldOpacity = oldDiv.style.opacity;
+		wrapperDivPositions[divId].top = oldDiv.style.top;
+		wrapperDivPositions[divId].left = oldDiv.style.left;
 		oldDiv.remove();
 	}
 	const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
 	enableDragElement(newDiv)
-	newDiv.style.top = oldTop
-	newDiv.style.left = oldLeft
-	newDiv.style.opacity = oldOpacity
+	newDiv.style.top = wrapperDivPositions[divId].top
+	newDiv.style.left = wrapperDivPositions[divId].left
+	newDiv.style.opacity = "" + (Number(wrapperDivPositions[divId].opacity) / 100)
 	return newDiv;
 }
 
@@ -347,8 +356,12 @@ function createCardsDiv(divId) {
 
 function deleteWrapperDivs() {
 	try {
-		document.body.removeChild(document.getElementById('allies'))
-		document.body.removeChild(document.getElementById('enemies'))
+		['allies', 'enemies'].forEach((divId) => {
+			const div = document.getElementById(divId)
+			wrapperDivPositions[divId].top = div.style.top
+			wrapperDivPositions[divId].left = div.style.left
+			document.body.removeChild(div)
+		})
 	} catch (e) {
 		console.error(e)
 	}
@@ -383,9 +396,7 @@ if (touchControlsElement) {
 			if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
 				const newValue = touchControlsElement.getAttribute('data-ui-mode');
 				console.log('New data-ui-mode:', newValue);
-				if(newValue === 'MODIFIER_SELECT'){
-				}
-				if(newValue === "MESSAGE" || newValue === "CONFIRM") {
+				if(newValue === "MESSAGE" || newValue === "COMMAND" || newValue === "CONFIRM") {
 					let currentSessionData = {}
 					for (key in localStorage) {
 						if ((slotId > 0 && key.includes(`sessionData${slotId}`)) || key.includes('sessionData')) {

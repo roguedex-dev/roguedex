@@ -5,6 +5,7 @@
 
 .allies-team {
   margin: 0 auto;
+  padding: 0 auto;
   position: absolute;
   top: 0;
   right: 0;
@@ -14,6 +15,7 @@
 
 .enemy-team {
   margin: 0 auto;
+  padding: 0 auto;
   position: absolute;
   top: 0;
   z-index: 1;
