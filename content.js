@@ -1,24 +1,11 @@
-const runningStatusDiv = document.createElement('div')
-runningStatusDiv.textContent = 'RogueDex is running!'
-runningStatusDiv.classList.add('text-base')
-runningStatusDiv.classList.add('running-status')
-document.body.insertBefore(runningStatusDiv, document.body.firstChild)
+const runningStatusDiv = document.createElement("div");
+runningStatusDiv.textContent = "RogueDex is running!";
+runningStatusDiv.classList.add("text-base");
+runningStatusDiv.classList.add("running-status");
+document.body.insertBefore(runningStatusDiv, document.body.firstChild);
 
-let wrapperDivPositions = {
-	'enemies': {
-		'top' : '0',
-		'left': '0',
-		'opacity': '100'
-	},
-	'allies': {
-		'top': '0',
-		'left': '0',
-		'opacity': '100'
-	}
-}
-
-let slotId = -1
-const saveKey = 'x0i2O7WRiANTqPmZ'
+let slotId = -1;
+const saveKey = "x0i2O7WRiANTqPmZ";
 // Creates the main wrapper div
 function createDiv() {
   const mainWrapper = document.createElement("div");
@@ -50,20 +37,74 @@ function createDiv() {
 }
 
 function createEnemyDiv() {
-	const enemies = document.createElement("div");
-	enemies.className = 'enemy-team'
+  const enemies = document.createElement("div");
+  enemies.className = "enemy-team";
   enemies.id = "enemies";
   return enemies;
 }
 
 function createAlliesDiv() {
-	const allies = document.createElement("div");
-	allies.className = 'allies-team'
+  const allies = document.createElement("div");
+  allies.className = "allies-team";
   allies.id = "allies";
   return allies;
 }
 
-// Enables drag-and-drop functionality on an element
+// Função para salvar as posições no chrome.storage
+// Função para salvar a posição no localStorage
+function savePositions() {
+	// Obtenha as divs dos inimigos e aliados
+	const enemiesDiv = document.getElementById('enemies');
+	const alliesDiv = document.getElementById('allies');
+  
+	// Obtenha as coordenadas de posição das equipes de inimigos e aliados
+	const enemiesPosition = {
+	  top: enemiesDiv.style.top,
+	  left: enemiesDiv.style.left
+	};
+	const alliesPosition = {
+	  top: alliesDiv.style.top,
+	  left: alliesDiv.style.left
+	};
+  
+	// Salve as coordenadas no localStorage
+	localStorage.setItem('enemiesPosition', JSON.stringify(enemiesPosition));
+	localStorage.setItem('alliesPosition', JSON.stringify(alliesPosition));
+  }
+  
+  
+  // Função para carregar a última posição salva do localStorage
+  function loadPositions() {
+	// Obtenha as coordenadas salvas do localStorage
+	const enemiesPosition = JSON.parse(localStorage.getItem('enemiesPosition'));
+	const alliesPosition = JSON.parse(localStorage.getItem('alliesPosition'));
+
+	// Verifique se as posições estão disponíveis no localStorage
+	if (enemiesPosition) {
+	  // Defina a posição da equipe de inimigos com base na última posição salva
+	  enemiesDiv.style.top = enemiesPosition.top || "0px";
+	  enemiesDiv.style.left = enemiesPosition.left || "0px";
+	} else {
+	  // Se não houver posição salva para os inimigos, defina-as como "0px"
+	  enemiesDiv.style.top = "0px";
+	  enemiesDiv.style.left = "0px";
+	}
+  
+	if (alliesPosition) {
+	  // Defina a posição da equipe de aliados com base na última posição salva
+	  alliesDiv.style.top = alliesPosition.top || "0px";
+	  alliesDiv.style.left = alliesPosition.left || "0px";
+	} else {
+	  // Se não houver posição salva para os aliados, defina-as como "0px"
+	  alliesDiv.style.top = "0px";
+	  alliesDiv.style.left = "0px";
+	}
+  }
+
+// Função para habilitar o arrastar e soltar e salvar as posições
+let isDragging = false;
+
+// Função para habilitar o arrastar e soltar e salvar as posições ao soltar o mouse
 function enableDragElement(elmnt) {
   let pos1 = 0,
     pos2 = 0,
@@ -82,6 +123,7 @@ function enableDragElement(elmnt) {
     pos4 = e.clientY;
     document.onmouseup = stopDragging;
     document.onmousemove = dragElement;
+    isDragging = true;
   }
 
   // Handles dragging movement
@@ -101,79 +143,87 @@ function enableDragElement(elmnt) {
   function stopDragging() {
     document.onmouseup = null;
     document.onmousemove = null;
+    isDragging = false;
+    
+    // Salve as posições somente quando o mouse é solto
+    if (!isDragging) {
+      savePositions();
+    }
   }
 }
 
-const enemiesDiv = createEnemyDiv()
-const alliesDiv = createAlliesDiv()
+const enemiesDiv = createEnemyDiv();
+const alliesDiv = createAlliesDiv();
 
+// Carregue as posições ao iniciar
+loadPositions();
+
+// Habilita o arrastar e soltar e salva as posições
 enableDragElement(enemiesDiv);
 enableDragElement(alliesDiv);
 
 document.body.appendChild(enemiesDiv);
 document.body.appendChild(alliesDiv);
 
-let Types
+let Types;
 (function (Types) {
-	Types[Types["normal"] = 1] = 1;
-	Types[Types["fighting"] = 2] = 2;
-	Types[Types["flying"] = 3] = 3;
-	Types[Types["poison"] = 4] = 4;
-	Types[Types["ground"] = 5] = 5;
-	Types[Types["rock"] = 6] = 6;
-	Types[Types["bug"] = 7] = 7;
-	Types[Types["ghost"] = 8] = 8;
-	Types[Types["steel"] = 9] = 9;
-	Types[Types["fire"] = 10] = 10;
-	Types[Types["water"] = 11] = 11;
-	Types[Types["grass"] = 12] = 12;
-	Types[Types["electric"] = 13] = 13;
-	Types[Types["psychic"] = 14] = 14;
-	Types[Types["ice"] = 15] = 15;
-	Types[Types["dragon"] = 16] = 16;
-	Types[Types["dark"] = 17] = 17;
-	Types[Types["fairy"] = 18] = 18;
+  Types[(Types["normal"] = 1)] = 1;
+  Types[(Types["fighting"] = 2)] = 2;
+  Types[(Types["flying"] = 3)] = 3;
+  Types[(Types["poison"] = 4)] = 4;
+  Types[(Types["ground"] = 5)] = 5;
+  Types[(Types["rock"] = 6)] = 6;
+  Types[(Types["bug"] = 7)] = 7;
+  Types[(Types["ghost"] = 8)] = 8;
+  Types[(Types["steel"] = 9)] = 9;
+  Types[(Types["fire"] = 10)] = 10;
+  Types[(Types["water"] = 11)] = 11;
+  Types[(Types["grass"] = 12)] = 12;
+  Types[(Types["electric"] = 13)] = 13;
+  Types[(Types["psychic"] = 14)] = 14;
+  Types[(Types["ice"] = 15)] = 15;
+  Types[(Types["dragon"] = 16)] = 16;
+  Types[(Types["dark"] = 17)] = 17;
+  Types[(Types["fairy"] = 18)] = 18;
 })(Types || (Types = {}));
 
 let Stat;
 (function (Stat) {
-    Stat[Stat["HP"] = 0] = "HP";
-    Stat[Stat["ATK"] = 1] = "ATK";
-    Stat[Stat["DEF"] = 2] = "DEF";
-    Stat[Stat["SPATK"] = 3] = "SPATK";
-    Stat[Stat["SPDEF"] = 4] = "SPDEF";
-    Stat[Stat["SPD"] = 5] = "SPD";
+  Stat[(Stat["HP"] = 0)] = "HP";
+  Stat[(Stat["ATK"] = 1)] = "ATK";
+  Stat[(Stat["DEF"] = 2)] = "DEF";
+  Stat[(Stat["SPATK"] = 3)] = "SPATK";
+  Stat[(Stat["SPDEF"] = 4)] = "SPDEF";
+  Stat[(Stat["SPD"] = 5)] = "SPD";
 })(Stat || (Stat = {}));
-;
-
 function createTooltipDiv(tip) {
-	const tooltip = document.createElement('div')
-	tooltip.classList.add('text-base')
-	tooltip.classList.add('tooltiptext')
-	tooltip.textContent = tip
-	return tooltip
+  const tooltip = document.createElement("div");
+  tooltip.classList.add("text-base");
+  tooltip.classList.add("tooltiptext");
+  tooltip.textContent = tip;
+  return tooltip;
 }
 
 // Current values: weaknesses, resistances, immunities
 function createTypeEffectivenessWrapper(effectiveness, types) {
-	const typeEffectivenessWrapper = document.createElement('div')
-	typeEffectivenessWrapper.classList.add(`pokemon-${effectiveness}`);
-	typeEffectivenessWrapper.classList.add('tooltip');
-	let counter = 0;
-	let block = document.createElement('div');
-	typeEffectivenessWrapper.appendChild(block)
-	types.forEach(type => {
-		if (counter % 3 === 0) {
-			block = document.createElement('div');
-			typeEffectivenessWrapper.appendChild(block)
-		}
-    const typeIcon = document.createElement('div');
+  const typeEffectivenessWrapper = document.createElement("div");
+  typeEffectivenessWrapper.classList.add(`pokemon-${effectiveness}`);
+  typeEffectivenessWrapper.classList.add("tooltip");
+  let counter = 0;
+  let block = document.createElement("div");
+  typeEffectivenessWrapper.appendChild(block);
+  types.forEach((type) => {
+    if (counter % 3 === 0) {
+      block = document.createElement("div");
+      typeEffectivenessWrapper.appendChild(block);
+    }
+    const typeIcon = document.createElement("div");
     typeIcon.style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')`;
-    typeIcon.className = 'type-icon';
-    block.appendChild(typeIcon)
+    typeIcon.className = "type-icon";
+    block.appendChild(typeIcon);
     counter += 1;
   });
-  return typeEffectivenessWrapper
+  return typeEffectivenessWrapper;
 }
 
 let currentEnemyPage = 0;
@@ -183,244 +233,309 @@ let alliesPokemon = [];
 let weather = {};
 
 function createArrowButtonsDiv(divId) {
-	const buttonsDiv = document.createElement('div')
-	buttonsDiv.classList.add('arrow-button-wrapper')
-	const arrowUpButton = document.createElement('button')
-	const arrowDownButton = document.createElement('button')
-	arrowUpButton.classList.add('text-base')
-	arrowDownButton.classList.add('text-base')
-	arrowUpButton.classList.add('arrow-button')
-	arrowDownButton.classList.add('arrow-button')
-	arrowUpButton.textContent = "↑"
-	arrowDownButton.textContent = "↓"
-	arrowUpButton.id = `${divId}-up`
-	arrowDownButton.id = `${divId}-down`
-	arrowUpButton.addEventListener('click', changePage)
-	arrowDownButton.addEventListener('click', changePage)
-	buttonsDiv.appendChild(arrowUpButton)
-	buttonsDiv.appendChild(arrowDownButton)
-	return buttonsDiv
+  const buttonsDiv = document.createElement("div");
+  buttonsDiv.classList.add("arrow-button-wrapper");
+  const arrowUpButton = document.createElement("button");
+  const arrowDownButton = document.createElement("button");
+  arrowUpButton.classList.add("text-base");
+  arrowDownButton.classList.add("text-base");
+  arrowUpButton.classList.add("arrow-button");
+  arrowDownButton.classList.add("arrow-button");
+  arrowUpButton.textContent = "↑";
+  arrowDownButton.textContent = "↓";
+  arrowUpButton.id = `${divId}-up`;
+  arrowDownButton.id = `${divId}-down`;
+  arrowUpButton.addEventListener("click", changePage);
+  arrowDownButton.addEventListener("click", changePage);
+  buttonsDiv.appendChild(arrowUpButton);
+  buttonsDiv.appendChild(arrowDownButton);
+  return buttonsDiv;
 }
 
-function createOpacitySliderDiv(divId, initialValue = "100") {
-	const sliderDiv = document.createElement('div')
-	sliderDiv.classList.add('slider-wrapper')
-	const opacityTextDiv = document.createElement('div')
-	opacityTextDiv.classList.add('text-base')
-	opacityTextDiv.textContent = "Opacity:"
-	const slider = document.createElement('input')
-	slider.type = "range"
-	slider.min = "10"
-	slider.max = "100"
-	slider.value = initialValue
-	slider.id = `${divId}-slider`
-	sliderDiv.appendChild(opacityTextDiv)
-	sliderDiv.appendChild(slider)
-	sliderDiv.addEventListener('input', changeOpacity)
-	return sliderDiv
+function createOpacitySliderDiv(divId) {
+  const sliderDiv = document.createElement("div");
+  sliderDiv.classList.add("slider-wrapper");
+
+  const opacityTextDiv = document.createElement("div");
+  opacityTextDiv.classList.add("text-base");
+  opacityTextDiv.textContent = "Opacity:";
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = "10";
+  slider.max = "100";
+  slider.value = "100";
+  slider.id = `${divId}-slider`;
+  sliderDiv.appendChild(opacityTextDiv);
+  sliderDiv.appendChild(slider);
+  sliderDiv.addEventListener("input", changeOpacity);
+  return sliderDiv;
 }
 
 function changeOpacity(e) {
-	const divId = e.target.id.split("-")[0]
-	const div = document.getElementById(divId)
-	wrapperDivPositions[divId].opacity = e.target.value
-	div.style.opacity = `${e.target.value / 100}`
+  const divId = e.target.id.split("-")[0];
+  const div = document.getElementById(divId);
+  div.style.opacity = `${e.target.value / 100}`;
 }
 
 function changePage(click) {
-	const buttonId = click.target.id
-	const divId = buttonId.split("-")[0]
-	const direction = buttonId.split("-")[1]
-	if (direction === 'up') {
-		if (divId === 'enemies') {
-			if (currentEnemyPage > 0) {
-				currentEnemyPage -= 1
-			} else {
-				currentEnemyPage = enemiesPokemon.length - 1
-			}
-		} else if (divId === 'allies') {
-			if (currentAllyPage > 0) {
-				currentAllyPage -= 1
-			} else {
-				currentAllyPage = alliesPokemon.length - 1
-			}
-		}		
-	} else if (direction === 'down') {
-		if (divId === 'enemies') {
-			if ((currentEnemyPage + 1) < enemiesPokemon.length) {
-				currentEnemyPage += 1
-			} else {
-				currentEnemyPage = 0
-			}
-		} else if (divId === 'allies') {
-			if ((currentAllyPage + 1) < alliesPokemon.length) {
-				currentAllyPage += 1
-			} else {
-				currentAllyPage = 0
-			}
-		}
-	}
-	createCardsDiv(divId)
+  const buttonId = click.target.id;
+  const divId = buttonId.split("-")[0];
+  const direction = buttonId.split("-")[1];
+  if (direction === "up") {
+    if (divId === "enemies") {
+      if (currentEnemyPage > 0) {
+        currentEnemyPage -= 1;
+      } else {
+        currentEnemyPage = enemiesPokemon.length - 1;
+      }
+    } else if (divId === "allies") {
+      if (currentAllyPage > 0) {
+        currentAllyPage -= 1;
+      } else {
+        currentAllyPage = alliesPokemon.length - 1;
+      }
+    }
+  } else if (direction === "down") {
+    if (divId === "enemies") {
+      if (currentEnemyPage + 1 < enemiesPokemon.length) {
+        currentEnemyPage += 1;
+      } else {
+        currentEnemyPage = 0;
+      }
+    } else if (divId === "allies") {
+      if (currentAllyPage + 1 < alliesPokemon.length) {
+        currentAllyPage += 1;
+      } else {
+        currentAllyPage = 0;
+      }
+    }
+  }
+  createCardsDiv(divId);
 }
 
 function createPokemonCardDiv(divId, pokemon) {
-	const card = document.createElement('div');
-	card.classList.add('pokemon-card');
+  const card = document.createElement("div");
+  card.classList.add("pokemon-card");
 
-	const opacitySliderDiv = createOpacitySliderDiv(divId, wrapperDivPositions[divId].opacity)
+  const opacitySliderDiv = createOpacitySliderDiv(divId);
 
-	const infoRow = document.createElement('div');
-	infoRow.style.display = 'flex';
+  const infoRow = document.createElement("div");
+  infoRow.style.display = "flex";
 
-	const iconWrapper = document.createElement('div');
-  iconWrapper.className = 'pokemon-icon';
-  const icon = document.createElement('img');
+  const iconWrapper = document.createElement("div");
+  iconWrapper.className = "pokemon-icon";
+  const icon = document.createElement("img");
   icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
   iconWrapper.appendChild(icon);
   infoRow.appendChild(iconWrapper);
 
-  const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
-	weaknessesWrapper.appendChild(createTooltipDiv('Weak to'))
+  const weaknessesWrapper = createTypeEffectivenessWrapper(
+    "weaknesses",
+    pokemon.typeEffectiveness.weaknesses
+  );
+  weaknessesWrapper.appendChild(createTooltipDiv("Weak to"));
 
-	const resistancesWrapper = createTypeEffectivenessWrapper('resistances', pokemon.typeEffectiveness.resistances)
-	resistancesWrapper.appendChild(createTooltipDiv('Resists'))
+  const resistancesWrapper = createTypeEffectivenessWrapper(
+    "resistances",
+    pokemon.typeEffectiveness.resistances
+  );
+  resistancesWrapper.appendChild(createTooltipDiv("Resists"));
 
-	const immunitiesWrapper = createTypeEffectivenessWrapper('immunities', pokemon.typeEffectiveness.immunities)
-	immunitiesWrapper.appendChild(createTooltipDiv('Immune to'))
+  const immunitiesWrapper = createTypeEffectivenessWrapper(
+    "immunities",
+    pokemon.typeEffectiveness.immunities
+  );
+  immunitiesWrapper.appendChild(createTooltipDiv("Immune to"));
 
-	infoRow.appendChild(weaknessesWrapper)
-	infoRow.appendChild(resistancesWrapper)
-	infoRow.appendChild(immunitiesWrapper)
+  infoRow.appendChild(weaknessesWrapper);
+  infoRow.appendChild(resistancesWrapper);
+  infoRow.appendChild(immunitiesWrapper);
 
-	const extraInfoRow = document.createElement('div');
-	extraInfoRow.classList.add('text-base')
-	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
-	
-	const ivsRow = document.createElement('div');
-	ivsRow.classList.add('text-base');
-	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
-	
-	let weatherRow = undefined
-	if (weather.type && weather.turnsLeft) {
-		weatherRow = document.createElement('div');
-		weatherRow.classList.add('text-base');
-		weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`
-	}
+  const extraInfoRow = document.createElement("div");
+  extraInfoRow.classList.add("text-base");
+  extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
 
-	card.appendChild(opacitySliderDiv)
-	card.appendChild(infoRow)
-	card.appendChild(extraInfoRow)
-	card.appendChild(ivsRow)
-	if (weatherRow) {
-		card.appendChild(weatherRow)
-	}
-	return card
+  const ivsRow = document.createElement("div");
+  ivsRow.classList.add("text-base");
+  ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${
+    pokemon.ivs[Stat["ATK"]]
+  }, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${
+    pokemon.ivs[Stat["SPDEF"]]
+  }, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
+
+  let weatherRow = undefined;
+  if (weather.type && weather.turnsLeft) {
+    weatherRow = document.createElement("div");
+    weatherRow.classList.add("text-base");
+    weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`;
+  }
+
+  card.appendChild(opacitySliderDiv);
+  card.appendChild(infoRow);
+  card.appendChild(extraInfoRow);
+  card.appendChild(ivsRow);
+  if (weatherRow) {
+    card.appendChild(weatherRow);
+  }
+  return card;
 }
 
 function createWrapperDiv(divId) {
-	const oldDiv = document.getElementById(divId)
+	const oldDiv = document.getElementById(divId);
+	let oldTop = "";
+	let oldLeft = "";
+	let oldOpacity = "";
+  
 	if (oldDiv) {
-		wrapperDivPositions[divId].top = oldDiv.style.top;
-		wrapperDivPositions[divId].left = oldDiv.style.left;
-		oldDiv.remove();
+	  oldTop = oldDiv.style.top;
+	  oldLeft = oldDiv.style.left;
+	  oldOpacity = oldDiv.style.opacity;
+	  oldDiv.remove();
 	}
-	const newDiv = divId === 'enemies' ? createEnemyDiv() : createAlliesDiv()
-	enableDragElement(newDiv)
-	newDiv.style.top = wrapperDivPositions[divId].top
-	newDiv.style.left = wrapperDivPositions[divId].left
-	newDiv.style.opacity = "" + (Number(wrapperDivPositions[divId].opacity) / 100)
+  
+	const newDiv = divId === "enemies" ? createEnemyDiv() : createAlliesDiv();
+	enableDragElement(newDiv);
+  
+	// Obter os valores salvos no localStorage
+	const savedPosition = JSON.parse(localStorage.getItem(`${divId}Position`));
+  
+	// Aplicar estilos com base nos valores salvos, se disponíveis
+	if (savedPosition) {
+	  newDiv.style.top = savedPosition.top;
+	  newDiv.style.left = savedPosition.left;
+	  newDiv.style.opacity = "1"; // Define a opacidade padrão como 1 se não estiver presente
+	} else {
+	  // Se não houver valores salvos, definir as posições como padrão
+	  newDiv.style.top = oldTop || "0px";
+	  newDiv.style.left = oldLeft || "0px";
+	  newDiv.style.opacity = oldOpacity || "1"; // Define a opacidade padrão como 1 se não estiver presente
+	}
+  
 	return newDiv;
-}
+  }
+  
 
 function createCardsDiv(divId) {
-	let newDiv = createWrapperDiv(divId)
-	let buttonsDiv = createArrowButtonsDiv(divId)
-  newDiv.appendChild(buttonsDiv)
-  let pokemon = {}
-  if (divId === 'enemies') {
-  	if (currentEnemyPage >= enemiesPokemon.length) currentEnemyPage = enemiesPokemon.length - 1
-  	pokemon = enemiesPokemon[currentEnemyPage]
-  }
-  else {
-  	if (currentAllyPage >= alliesPokemon.length) currentAllyPage = alliesPokemon.length - 1
-  	pokemon = alliesPokemon[currentAllyPage]
+  let newDiv = createWrapperDiv(divId);
+  let buttonsDiv = createArrowButtonsDiv(divId);
+  newDiv.appendChild(buttonsDiv);
+  let pokemon = {};
+  if (divId === "enemies") {
+    if (currentEnemyPage >= enemiesPokemon.length)
+      currentEnemyPage = enemiesPokemon.length - 1;
+    pokemon = enemiesPokemon[currentEnemyPage];
+  } else {
+    if (currentAllyPage >= alliesPokemon.length)
+      currentAllyPage = alliesPokemon.length - 1;
+    pokemon = alliesPokemon[currentAllyPage];
   }
   const pokemonCards = document.createElement("div");
-  pokemonCards.className = "pokemon-cards"
-	const card = createPokemonCardDiv(divId, pokemon)
-	pokemonCards.appendChild(card);
-	newDiv.appendChild(pokemonCards)
-	document.body.appendChild(newDiv)
-	return newDiv
+  pokemonCards.className = "pokemon-cards";
+  const card = createPokemonCardDiv(divId, pokemon);
+  pokemonCards.appendChild(card);
+  newDiv.appendChild(pokemonCards);
+  document.body.appendChild(newDiv);
+  return newDiv;
 }
 
 function deleteWrapperDivs() {
-	try {
-		['allies', 'enemies'].forEach((divId) => {
-			const div = document.getElementById(divId)
-			wrapperDivPositions[divId].top = div.style.top
-			wrapperDivPositions[divId].left = div.style.left
-			document.body.removeChild(div)
-		})
-	} catch (e) {
-		console.error(e)
-	}
-	
+  try {
+    document.body.removeChild(document.getElementById("allies"));
+    document.body.removeChild(document.getElementById("enemies"));
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-	console.log("Got message:", message, "from", sender, "current message:", document.getElementById('touchControls').getAttribute('data-ui-mode'))
-	const uiMode = touchControlsElement.getAttribute('data-ui-mode')
-	console.log("Current ui mode: ", uiMode)
-	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
-		slotId = message.slotId
-		if ( uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponde({ success: true })
-		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
-		if (message.type === 'UPDATE_ENEMIES_DIV') {
-			enemiesPokemon = message.pokemon
-		}
-		else {
-			alliesPokemon = message.pokemon
-		}
-		weather = message.weather;
-		if (weather.turnsLeft === 0) weather.turnsLeft = 'N/A'
-		createCardsDiv(divId)
+  console.log(
+    "Got message:",
+    message,
+    "from",
+    sender,
+    "current message:",
+    document.getElementById("touchControls").getAttribute("data-ui-mode")
+  );
+  const uiMode = touchControlsElement.getAttribute("data-ui-mode");
+  console.log("Current ui mode: ", uiMode);
+  if (
+    message.type === "UPDATE_ENEMIES_DIV" ||
+    message.type === "UPDATE_ALLIES_DIV"
+  ) {
+    slotId = message.slotId;
+    if (uiMode === "TITLE" || uiMode === "SAVE_SLOT")
+      return sendResponde({ success: true });
+    let divId = message.type === "UPDATE_ENEMIES_DIV" ? "enemies" : "allies";
+    if (message.type === "UPDATE_ENEMIES_DIV") {
+      enemiesPokemon = message.pokemon;
+    } else {
+      alliesPokemon = message.pokemon;
+    }
+    weather = message.weather;
+    if (weather.turnsLeft === 0) weather.turnsLeft = "N/A";
+    createCardsDiv(divId);
     sendResponse({ success: true });
-	}
+  }
 });
 
-const touchControlsElement = document.getElementById('touchControls')
+const touchControlsElement = document.getElementById("touchControls");
 if (touchControlsElement) {
-	const observer = new MutationObserver((mutations) => {
-		mutations.forEach(async (mutation) => {
-			if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
-				const newValue = touchControlsElement.getAttribute('data-ui-mode');
-				console.log('New data-ui-mode:', newValue);
-				if(newValue === "MESSAGE" || newValue === "COMMAND" || newValue === "CONFIRM") {
-					let currentSessionData = {}
-					for (key in localStorage) {
-						if ((slotId > 0 && key.includes(`sessionData${slotId}`)) || key.includes('sessionData')) {
-							currentSessionData = localStorage.getItem(key)
-							break
-						}
-					}
-					currentSessionData = JSON.parse(CryptoJS.AES.decrypt(currentSessionData, saveKey).toString(CryptoJS.enc.Utf8))
-					console.log("Got session data", currentSessionData, "for slot id", slotId)
-					browserApi.runtime.sendMessage({ type: 'BG_GET_SAVEDATA', data: currentSessionData, slotId: slotId })
-				}
-				if(newValue === "SAVE_SLOT") {
-					setTimeout(function() {
-            for (key in localStorage) {
-              if (key.includes('sessionData')) localStorage.removeItem(key)
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach(async (mutation) => {
+      if (
+        mutation.type === "attributes" &&
+        mutation.attributeName === "data-ui-mode"
+      ) {
+        const newValue = touchControlsElement.getAttribute("data-ui-mode");
+        console.log("New data-ui-mode:", newValue);
+        if (newValue === "MODIFIER_SELECT") {
+        }
+        if (newValue === "MESSAGE" || newValue === "CONFIRM") {
+          let currentSessionData = {};
+          for (key in localStorage) {
+            if (
+              (slotId > 0 && key.includes(`sessionData${slotId}`)) ||
+              key.includes("sessionData")
+            ) {
+              currentSessionData = localStorage.getItem(key);
+              break;
             }
-          }, 1000)
-				}
-				if(newValue === "SAVE_SLOT" || newValue === "TITLE" || newValue === "MODIFIER_SELECT" || newValue === "STARTER_SELECT") {
-					deleteWrapperDivs()
-				}
-			}
-		});
-	});
+          }
+          currentSessionData = JSON.parse(
+            CryptoJS.AES.decrypt(currentSessionData, saveKey).toString(
+              CryptoJS.enc.Utf8
+            )
+          );
+          console.log(
+            "Got session data",
+            currentSessionData,
+            "for slot id",
+            slotId
+          );
+          browserApi.runtime.sendMessage({
+            type: "BG_GET_SAVEDATA",
+            data: currentSessionData,
+            slotId: slotId,
+          });
+        }
+        if (newValue === "SAVE_SLOT") {
+          setTimeout(function () {
+            for (key in localStorage) {
+              if (key.includes("sessionData")) localStorage.removeItem(key);
+            }
+          }, 1000);
+        }
+        if (
+          newValue === "SAVE_SLOT" ||
+          newValue === "TITLE" ||
+          newValue === "MODIFIER_SELECT" ||
+          newValue === "STARTER_SELECT"
+        ) {
+          deleteWrapperDivs();
+        }
+      }
+    });
+  });
 
-	observer.observe(touchControlsElement, { attributes: true });
+  observer.observe(touchControlsElement, { attributes: true });
 }
