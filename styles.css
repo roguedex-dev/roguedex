@@ -4,7 +4,7 @@
 }
 
 .allies-team {
-  margin: 20px;
+  margin: 0 auto;
   position: absolute;
   top: 0;
   right: 0;
@@ -13,7 +13,7 @@
 }
 
 .enemy-team {
-  margin: 20px;
+  margin: 0 auto;
   position: absolute;
   top: 0;
   z-index: 1;
@@ -161,4 +161,13 @@ input[type="range"] {
 
 .slider-wrapper {
   display: flex;
+}
+
+.running-status {
+  position: absolute;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  color: blue;
+  background-color: #ffffff50;
 }

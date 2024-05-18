@@ -1,3 +1,9 @@
+const runningStatusDiv = document.createElement('div')
+runningStatusDiv.textContent = 'RogueDex is running!'
+runningStatusDiv.classList.add('text-base')
+runningStatusDiv.classList.add('running-status')
+document.body.insertBefore(runningStatusDiv, document.body.firstChild)
+
 let slotId = -1
 const saveKey = 'x0i2O7WRiANTqPmZ'
 // Creates the main wrapper div
@@ -340,8 +346,13 @@ function createCardsDiv(divId) {
 }
 
 function deleteWrapperDivs() {
-	document.body.removeChild(document.getElementById('allies'))
-	document.body.removeChild(document.getElementById('enemies'))
+	try {
+		document.body.removeChild(document.getElementById('allies'))
+		document.body.removeChild(document.getElementById('enemies'))
+	} catch (e) {
+		console.error(e)
+	}
+	
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
