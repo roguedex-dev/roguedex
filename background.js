@@ -1,4 +1,5 @@
 const browserApi = typeof browser !== "undefined" ? browser : chrome;
+let slotId = -1
 let Abilities;
 (function (Abilities) {
     Abilities[Abilities["NONE"] = 0] = "NONE";
@@ -464,7 +465,7 @@ async function getPokemonTypeEffectiveness(id) {
 
 function updateDiv(pokemon, weather, message) {
   browserApi.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    browserApi.tabs.sendMessage(tabs[0].id, { type: message, pokemon: pokemon, weather: weather }, (response) => {
+    browserApi.tabs.sendMessage(tabs[0].id, { type: message, pokemon: pokemon, weather: weather, slotId: slotId }, (response) => {
       if (response && response.success) {
           console.log('Div updated successfully');
       } else {
@@ -578,8 +579,9 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
 
 browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   // Happens when loading a savegame or continuing an old run
-  if (request.type == 'GET_SAVEDATA') {
+  if (request.type == 'BG_GET_SAVEDATA') {
     const savedata = request.data
+    slotId = request.slotId
     console.log("Received save data", savedata)
     appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.enemyParty), savedata.arena, "UPDATE_ENEMIES_DIV")
     appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.party), savedata.arena, "UPDATE_ALLIES_DIV")

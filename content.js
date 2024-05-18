@@ -1,3 +1,5 @@
+let slotId = -1
+const saveKey = 'x0i2O7WRiANTqPmZ'
 // Creates the main wrapper div
 function createDiv() {
   const mainWrapper = document.createElement("div");
@@ -302,7 +304,6 @@ function createWrapperDiv(divId) {
 	let oldLeft = ''
 	let oldOpacity = ''
 	if (oldDiv) {
-		console.log("Removing DIV with id", divId)
 		oldTop = oldDiv.style.top;
 		oldLeft = oldDiv.style.left;
 		oldOpacity = oldDiv.style.opacity;
@@ -335,13 +336,21 @@ function createCardsDiv(divId) {
 	pokemonCards.appendChild(card);
 	newDiv.appendChild(pokemonCards)
 	document.body.appendChild(newDiv)
-	console.log("Appended", newDiv)
 	return newDiv
 }
 
+function deleteWrapperDivs() {
+	document.body.removeChild(document.getElementById('allies'))
+	document.body.removeChild(document.getElementById('enemies'))
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-	console.log("Got message:", message, "from", sender)
+	console.log("Got message:", message, "from", sender, "current message:", document.getElementById('touchControls').getAttribute('data-ui-mode'))
+	const uiMode = touchControlsElement.getAttribute('data-ui-mode')
+	console.log("Current ui mode: ", uiMode)
 	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
+		slotId = message.slotId
+		if ( uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponde({ success: true })
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
 		if (message.type === 'UPDATE_ENEMIES_DIV') {
 			enemiesPokemon = message.pokemon
@@ -355,3 +364,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ success: true });
 	}
 });
+
+const touchControlsElement = document.getElementById('touchControls')
+if (touchControlsElement) {
+	const observer = new MutationObserver((mutations) => {
+		mutations.forEach(async (mutation) => {
+			if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
+				const newValue = touchControlsElement.getAttribute('data-ui-mode');
+				console.log('New data-ui-mode:', newValue);
+				if(newValue === 'MODIFIER_SELECT'){
+				}
+				if(newValue === "MESSAGE" || newValue === "CONFIRM") {
+					let currentSessionData = {}
+					for (key in localStorage) {
+						if ((slotId > 0 && key.includes(`sessionData${slotId}`)) || key.includes('sessionData')) {
+							currentSessionData = localStorage.getItem(key)
+							break
+						}
+					}
+					currentSessionData = JSON.parse(CryptoJS.AES.decrypt(currentSessionData, saveKey).toString(CryptoJS.enc.Utf8))
+					console.log("Got session data", currentSessionData, "for slot id", slotId)
+					browserApi.runtime.sendMessage({ type: 'BG_GET_SAVEDATA', data: currentSessionData, slotId: slotId })
+				}
+				if(newValue === "SAVE_SLOT") {
+					setTimeout(function() {
+            for (key in localStorage) {
+              if (key.includes('sessionData')) localStorage.removeItem(key)
+            }
+          }, 1000)
+				}
+				if(newValue === "SAVE_SLOT" || newValue === "TITLE" || newValue === "MODIFIER_SELECT" || newValue === "STARTER_SELECT") {
+					deleteWrapperDivs()
+				}
+			}
+		});
+	});
+
+	observer.observe(touchControlsElement, { attributes: true });
+}
