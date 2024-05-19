@@ -147,33 +147,10 @@ let Stat;
 ;
 
 function createTooltipDiv(tip) {
-	const tooltip = document.createElement('div')
-	tooltip.classList.add('text-base')
-	tooltip.classList.add('tooltiptext')
-	tooltip.textContent = tip
-	return tooltip
-}
-
-// Current values: weaknesses, resistances, immunities
-function createTypeEffectivenessWrapper(effectiveness, types) {
-	const typeEffectivenessWrapper = document.createElement('div')
-	typeEffectivenessWrapper.classList.add(`pokemon-${effectiveness}`);
-	typeEffectivenessWrapper.classList.add('tooltip');
-	let counter = 0;
-	let block = document.createElement('div');
-	typeEffectivenessWrapper.appendChild(block)
-	types.forEach(type => {
-		if (counter % 3 === 0) {
-			block = document.createElement('div');
-			typeEffectivenessWrapper.appendChild(block)
-		}
-    const typeIcon = document.createElement('div');
-    typeIcon.style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')`;
-    typeIcon.className = 'type-icon';
-    block.appendChild(typeIcon)
-    counter += 1;
-  });
-  return typeEffectivenessWrapper
+	const tooltipHtml = `
+		<div class="text-base tooltiptext">${tip}</div>
+	`
+	return tooltipHtml
 }
 
 let currentEnemyPage = 0;
@@ -181,44 +158,6 @@ let currentAllyPage = 0;
 let enemiesPokemon = [];
 let alliesPokemon = [];
 let weather = {};
-
-function createArrowButtonsDiv(divId) {
-	const buttonsDiv = document.createElement('div')
-	buttonsDiv.classList.add('arrow-button-wrapper')
-	const arrowUpButton = document.createElement('button')
-	const arrowDownButton = document.createElement('button')
-	arrowUpButton.classList.add('text-base')
-	arrowDownButton.classList.add('text-base')
-	arrowUpButton.classList.add('arrow-button')
-	arrowDownButton.classList.add('arrow-button')
-	arrowUpButton.textContent = "↑"
-	arrowDownButton.textContent = "↓"
-	arrowUpButton.id = `${divId}-up`
-	arrowDownButton.id = `${divId}-down`
-	arrowUpButton.addEventListener('click', changePage)
-	arrowDownButton.addEventListener('click', changePage)
-	buttonsDiv.appendChild(arrowUpButton)
-	buttonsDiv.appendChild(arrowDownButton)
-	return buttonsDiv
-}
-
-function createOpacitySliderDiv(divId, initialValue = "100") {
-	const sliderDiv = document.createElement('div')
-	sliderDiv.classList.add('slider-wrapper')
-	const opacityTextDiv = document.createElement('div')
-	opacityTextDiv.classList.add('text-base')
-	opacityTextDiv.textContent = "Opacity:"
-	const slider = document.createElement('input')
-	slider.type = "range"
-	slider.min = "10"
-	slider.max = "100"
-	slider.value = initialValue
-	slider.id = `${divId}-slider`
-	sliderDiv.appendChild(opacityTextDiv)
-	sliderDiv.appendChild(slider)
-	sliderDiv.addEventListener('input', changeOpacity)
-	return sliderDiv
-}
 
 function changeOpacity(e) {
 	const divId = e.target.id.split("-")[0]
@@ -263,58 +202,112 @@ function changePage(click) {
 	createCardsDiv(divId)
 }
 
-function createPokemonCardDiv(divId, pokemon) {
-	const card = document.createElement('div');
-	card.classList.add('pokemon-card');
+function createArrowButtonsDiv(divId, upString, downString) {
+	let result = {};
+	result.idUp = `${divId}-up`
+	result.idDown = `${divId}-down`
 
-	const opacitySliderDiv = createOpacitySliderDiv(divId, wrapperDivPositions[divId].opacity)
+	result.html = `
+		<div class="arrow-button-wrapper">
+			<button class="text-base arrow-button" id="${result.idUp}">${upString}</button>
+			<button class="text-base arrow-button" id="${result.idDown}">${downString}</button>
+		</div>
+	`
 
-	const infoRow = document.createElement('div');
-	infoRow.style.display = 'flex';
+	return result
+}
 
-	const iconWrapper = document.createElement('div');
-  iconWrapper.className = 'pokemon-icon';
-  const icon = document.createElement('img');
-  icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-  iconWrapper.appendChild(icon);
-  infoRow.appendChild(iconWrapper);
+function createOpacitySliderDiv(divId, initialValue = "100", min = "10", max = "100") {
+	let result = {};
+	result.id = `${divId}-slider`
 
-  const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
-	weaknessesWrapper.appendChild(createTooltipDiv('Weak to'))
+	result.html = `
+  		<div class="slider-wrapper">
+  			<div class="text-base">Opacity:</div>
+  			<input type="range" min="${min}" max="${max}" value="${initialValue}" id="${result.id}">
+  		</div>
+  	`
+	return result
+}
 
-	const resistancesWrapper = createTypeEffectivenessWrapper('resistances', pokemon.typeEffectiveness.resistances)
-	resistancesWrapper.appendChild(createTooltipDiv('Resists'))
+// Current values: weaknesses, resistances, immunities
+function createTypeEffectivenessWrapper(typeEffectivenesses) {
+	let typesHTML = `
+		${Object.keys(typeEffectivenesses).map((effectiveness) => {
+			if (typeEffectivenesses[effectiveness].length === 0) return ''
+			const tooltipMap = {
+			  weaknesses: "Weak to",
+			  resistances: "Resists",
+			  immunities: "Immune to"
+			};
+			return `
+	      <div class="pokemon-${effectiveness} tooltip">
 
-	const immunitiesWrapper = createTypeEffectivenessWrapper('immunities', pokemon.typeEffectiveness.immunities)
-	immunitiesWrapper.appendChild(createTooltipDiv('Immune to'))
+	          ${typeEffectivenesses[effectiveness].map((type, counter) => `
+	              ${/* The current html structure requires to wrap every third element in a div, the implementation here gets a bit ugly. */''}
+	              ${ ((counter + 1) % 3 === 1)  ? 
+	                `<div>` 
+	              : ''}
 
-	infoRow.appendChild(weaknessesWrapper)
-	infoRow.appendChild(resistancesWrapper)
-	infoRow.appendChild(immunitiesWrapper)
+	              <div class="type-icon" style="background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')"></div>
+	              
+	              ${/* Closing div, after every third element or when the arrays max length is reached. */''}
+	              ${ ((counter + 1) % 3 === 0) || ((counter + 1) === typeEffectivenesses[effectiveness].length) ? 
+	                `</div>` 
+	              : ''}
+	          `).join('')}
+	          ${createTooltipDiv(tooltipMap[effectiveness] || "")}
+	      </div>
+	  `}).join('')}
+  `
 
-	const extraInfoRow = document.createElement('div');
-	extraInfoRow.classList.add('text-base')
-	extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
-	
-	const ivsRow = document.createElement('div');
-	ivsRow.classList.add('text-base');
-	ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
-	
-	let weatherRow = undefined
-	if (weather.type && weather.turnsLeft) {
-		weatherRow = document.createElement('div');
-		weatherRow.classList.add('text-base');
-		weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`
-	}
+  return typesHTML
+}
 
-	card.appendChild(opacitySliderDiv)
-	card.appendChild(infoRow)
-	card.appendChild(extraInfoRow)
-	card.appendChild(ivsRow)
-	if (weatherRow) {
-		card.appendChild(weatherRow)
-	}
-	return card
+function createPokemonCardDiv(cardclass, cardId, pokemon) {
+  let opacityRangeMin = 10;
+  let opacityRangeMax = 100;
+  let pokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+  
+	const opacitySlider = createOpacitySliderDiv(cardId, wrapperDivPositions[cardId].opacity, opacityRangeMin, opacityRangeMax)
+	const typeEffectivenessHTML = createTypeEffectivenessWrapper(pokemon.typeEffectiveness)
+
+  let cardHTML = `
+  	<div class="pokemon-cards">
+	    <div class="pokemon-card">
+	      ${opacitySlider.html}
+	      <div style="display: flex;">
+	        <div class="pokemon-icon">
+	            <img src="${pokemonImageUrl}">
+	        </div>
+
+					${/* Displays the 3 type effectiveness segemtns (weaknesses, resistances, immunities). */''}
+	        ${typeEffectivenessHTML}
+	        
+	      </div>
+
+	      <div class="text-base">
+	        Ability: ${pokemon.ability} - Nature: ${pokemon.nature}
+	      </div>
+	      <div class="text-base">
+	        HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}
+	      </div>
+	      <div class="text-base">
+	        SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}
+	      </div>
+	        
+	      ${(weather.type && weather.turnsLeft) ? 
+	        `<div class="text-base">Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}</div>` 
+	      : ''}
+	    </div>
+    </div>
+  `
+
+  const cardObj = {}
+  cardObj.html = cardHTML;
+  cardObj.slider = opacitySlider.id;
+
+  return cardObj
 }
 
 function createWrapperDiv(divId) {
@@ -334,8 +327,7 @@ function createWrapperDiv(divId) {
 
 function createCardsDiv(divId) {
 	let newDiv = createWrapperDiv(divId)
-	let buttonsDiv = createArrowButtonsDiv(divId)
-  newDiv.appendChild(buttonsDiv)
+
   let pokemon = {}
   if (divId === 'enemies') {
   	if (currentEnemyPage >= enemiesPokemon.length) currentEnemyPage = enemiesPokemon.length - 1
@@ -344,13 +336,35 @@ function createCardsDiv(divId) {
   else {
   	if (currentAllyPage >= alliesPokemon.length) currentAllyPage = alliesPokemon.length - 1
   	pokemon = alliesPokemon[currentAllyPage]
-  }
-  const pokemonCards = document.createElement("div");
-  pokemonCards.className = "pokemon-cards"
-	const card = createPokemonCardDiv(divId, pokemon)
-	pokemonCards.appendChild(card);
-	newDiv.appendChild(pokemonCards)
+  }	
+
+  let divClass = divId === 'enemies' ? 'enemy-team' : 'allies-team'
+
+	const cardObj = createPokemonCardDiv(divClass, divId, pokemon)
+	const buttonsObj = createArrowButtonsDiv(divId, "↑", "↓")
+
+	/*
+		Assemble the wrapper DIVs inner html.
+	*/
+	const cardsHTML = `
+  	${buttonsObj.html}
+  	${cardObj.html}
+  `
+
+  /*
+		Insert the parsed nodes into the DOM tree just inside the element, before its first child.
+		"newDiv.innerHTML = cardsHTML" also works instead of using ".insertAdjacentHTML()"
+  */
+	newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
 	document.body.appendChild(newDiv)
+
+	/*
+		Add event listeners after all elements are properly added to the DOM and initialized.
+	*/
+	document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
+	document.getElementById(buttonsObj.idUp).addEventListener('click', changePage)
+	document.getElementById(buttonsObj.idDown).addEventListener('click', changePage)
+
 	return newDiv
 }
 
@@ -374,7 +388,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	console.log("Current ui mode: ", uiMode)
 	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
 		slotId = message.slotId
-		if ( uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponde({ success: true })
+		if ( uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponse({ success: true })
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
 		if (message.type === 'UPDATE_ENEMIES_DIV') {
 			enemiesPokemon = message.pokemon
