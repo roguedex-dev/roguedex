@@ -1,0 +1,207 @@
+@font-face {
+    font-family: 'PKMNems';
+    src: url('../fonts/pkmnems.ttf') format('truetype');
+}
+
+:root {
+    --corner-size: 32px; /* Adjust this value as needed */
+    --red-main: rgb(248, 136, 128);
+    --red-sub: rgb(248, 48, 24);
+    --yellow-main: rgb(248, 176, 90);
+    --yellow-sub: rgb(192, 120, 0);
+    --white-main: rgb(248, 248, 248);
+    --white-sub: rgb(107, 90, 115);
+    --setting-text-size: 30px;
+}
+
+body {
+    margin: 0;
+    position: relative;
+    width: 700px; /* Defined width */
+    /*height: 300px; !* Defined height *!*/
+    overflow: hidden;
+    background: rgb(55, 45, 62); /* Make the background transparent */
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.background-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Ensure it doesn't block other content */
+    pointer-events: none; /* Ensure it doesn't interact with other elements */
+    background: transparent; /* Ensure the container background is transparent */
+}
+
+.background-container > div {
+    position: absolute;
+    background-size: contain;
+    image-rendering: pixelated;
+    background-color: transparent; /* Ensure each part is transparent */
+}
+
+.corner-top-left,
+.corner-top-right,
+.corner-bottom-left,
+.corner-bottom-right {
+    width: var(--corner-size);
+    height: var(--corner-size);
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    background-color: transparent; /* Ensure corners are transparent */
+}
+
+.corner-top-left {
+    top: 0;
+    left: 0;
+}
+
+.corner-top-right {
+    top: 0;
+    right: 0;
+}
+
+.corner-bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.corner-bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+.edge-top,
+.edge-bottom {
+    left: var(--corner-size);
+    right: var(--corner-size);
+    height: var(--corner-size);
+    background-size: auto 100%;
+    background-repeat: repeat-x;
+    image-rendering: pixelated;
+    background-color: transparent; /* Ensure edges are transparent */
+}
+
+.edge-top {
+    top: 0;
+}
+
+.edge-bottom {
+    bottom: 0;
+}
+
+.edge-left,
+.edge-right {
+    top: var(--corner-size);
+    bottom: var(--corner-size);
+    width: var(--corner-size);
+    background-size: 100% auto;
+    background-repeat: repeat-y;
+    image-rendering: pixelated;
+    background-color: transparent; /* Ensure edges are transparent */
+}
+
+.edge-left {
+    left: 0;
+}
+
+.edge-right {
+    right: 0;
+}
+
+.center {
+    top: var(--corner-size);
+    bottom: var(--corner-size);
+    left: var(--corner-size);
+    right: var(--corner-size);
+    background-size: contain;
+    background-repeat: repeat;
+    image-rendering: pixelated;
+    background-color: transparent; /* Ensure center is transparent */
+}
+
+#input-container {
+    font-family: 'PKMNems';
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    padding: calc(var(--corner-size) - 2px); /* Adjust padding as necessary to fit within the border */
+    position: relative;
+    z-index: 1; /* Ensure input-container appears above the background */
+    box-sizing: border-box; /* Ensure padding is included in the width and height */
+    background: transparent; /* Ensure input container is transparent */
+}
+
+.main-settings-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-title {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.input-item {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: var(--setting-text-size);
+}
+
+.setting-label {
+    margin-right: 10px;
+}
+
+.bool-label{
+    width: 160px !important;
+}
+
+.setting-options {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.setting-options .option {
+    width: 100%;
+    margin: 0 5px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--white-main); /* Default color */
+    text-shadow: 2px 2px 0 var(--white-sub);
+}
+
+.setting-options .option.selected {
+    color: var(--red-main); /* Selected color */
+    text-shadow: 2px 2px 0 var(--red-sub);
+}
+
+.setting-label{
+    color: var(--yellow-main); /* Focused color */
+    text-shadow: 2px 2px 0 var(--white-sub);
+    font-family: 'PKMNems';
+}
+
+.setting-label.focus {
+    color: var(--yellow-main); /* Focused color */
+    text-shadow: 2px 2px 0 var(--red-sub);
+    font-family: 'PKMNems';
+}
+
+#scaleSliderWrapper {
+    /* Optional styling for the scale slider wrapper */
+}
+
+#scaleSlider {
+    /* Optional styling for the scale slider */
+}
+
+#scaleValue {
+    font-family: 'PKMNems';
+    font-size: 16px;
+}
+
