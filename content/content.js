@@ -345,20 +345,16 @@ function deleteAllChildren(element) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
+    element.innerHTML = '';
 }
 
 function deleteWrapperDivs() {
     try {
         console.log("DELETE CALLED")
-        // ['allies', 'enemies'].forEach((divId) => {
-             const enemies = document.getElementById("enemies");
-            deleteAllChildren(enemies);
-        const allies = document.getElementById("allies");
+        let enemies = document.getElementById("enemies");
         deleteAllChildren(enemies);
-        //     wrapperDivPositions[divId].top = div.style.top
-        //     wrapperDivPositions[divId].left = div.style.left
-        //     document.body.removeChild(div)
-        // })
+        let allies = document.getElementById("allies");
+        deleteAllChildren(allies);
     } catch (e) {
         console.error(e)
     }
