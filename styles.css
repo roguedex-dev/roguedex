@@ -109,7 +109,7 @@
   display: grid;
 }
 .arrow-button {
-  font-size: min(8vh, 45px)
+  font-size: min(8vh, 3vw)
 }
 
 .tooltip .tooltiptext {
@@ -177,5 +177,5 @@ input[type="range"] {
 }
 
 .hidden-ability {
-  color: gold;
+  color: #f700ff;
 }

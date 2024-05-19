@@ -287,7 +287,7 @@ function createPokemonCardDiv(cardclass, cardId, pokemon) {
 	      </div>
 
 	      <div class="text-base">
-	      	<div class="tooltip" ${!pokemon.ability.is_hidden ? 'style="hidden-ability"' : ''} }">
+	      	<div class="tooltip ${pokemon.ability.isHidden ? 'hidden-ability' : ''}">
 	        	Ability: ${pokemon.ability.name} 
 	        	${createTooltipDiv(pokemon.ability.description)}
 	        </div>
@@ -338,11 +338,11 @@ function createCardsDiv(divId) {
 
   let pokemon = {}
   if (divId === 'enemies') {
-  	if (currentEnemyPage >= enemiesPokemon.length) currentEnemyPage = enemiesPokemon.length - 1
+  	if (currentEnemyPage >= enemiesPokemon.length) currentEnemyPage = 0
   	pokemon = enemiesPokemon[currentEnemyPage]
   }
   else {
-  	if (currentAllyPage >= alliesPokemon.length) currentAllyPage = alliesPokemon.length - 1
+  	if (currentAllyPage >= alliesPokemon.length) currentAllyPage = 0
   	pokemon = alliesPokemon[currentAllyPage]
   }	
 
@@ -437,7 +437,11 @@ if (touchControlsElement) {
             }
           }, 1000)
 				}
-				if(newValue === "SAVE_SLOT" || newValue === "TITLE" || newValue === "MODIFIER_SELECT" || newValue === "STARTER_SELECT") {
+				if(newValue === "SAVE_SLOT" || 
+					newValue === "TITLE" || 
+					newValue === "MODIFIER_SELECT" || 
+					newValue === "STARTER_SELECT" || 
+					newValue === "PARTY") {
 					deleteWrapperDivs()
 				}
 			}

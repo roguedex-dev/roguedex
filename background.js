@@ -80,13 +80,20 @@ async function getAbility(pokeID, abilityIndex) {
   try {
     const pokemonInfo = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeID}`);
     const data = await pokemonInfo.json();
+
+    const abilityLength = data.abilities.length
+
+    if (abilityIndex >= abilityLength) {
+        abilityIndex = abilityLength - 1 // Pokerogue uses a "None" ability as padding when pokémon have less than 3.
+    }
+    
     const abilityName = data.abilities[abilityIndex].ability.name
     const abilityInfo = await fetch(`https://pokeapi.co/api/v2/ability/${abilityName}`);
     const abilityData = await abilityInfo.json();
     return {
         'name': abilityName.toUpperCase().replace('-', ' '),
         'description': abilityData.flavor_text_entries[abilityData.flavor_text_entries.length - 1].flavor_text,
-        'is_hidden': data.abilities[abilityIndex].ability.is_hidden
+        'isHidden': data.abilities[abilityIndex].is_hidden
     }
   } catch (error) {
     console.error('Error fetching Pokémons ability:', error);
