@@ -352,6 +352,7 @@ function deleteWrapperDivs() {
     try {
         console.log("DELETE CALLED")
         let enemies = document.getElementById("enemies");
+        console.log(enemies);
         deleteAllChildren(enemies);
         let allies = document.getElementById("allies");
         deleteAllChildren(allies);
@@ -379,6 +380,7 @@ async function scaleElements() {
 async function initCreation(sessionData) {
     deleteWrapperDivs();
     let extensionSettings = await Utils.LocalStorage.getExtensionSettings();
+    console.log(extensionSettings);
     if (extensionSettings.showEnemies) {
         await dataMapping("enemyParty", "enemies", sessionData);
     }
