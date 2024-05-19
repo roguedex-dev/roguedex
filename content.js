@@ -287,7 +287,15 @@ function createPokemonCardDiv(cardclass, cardId, pokemon) {
 	      </div>
 
 	      <div class="text-base">
-	        Ability: ${pokemon.ability} - Nature: ${pokemon.nature}
+	      	<div class="tooltip" ${!pokemon.ability.is_hidden ? 'style="hidden-ability"' : ''} }">
+	        	Ability: ${pokemon.ability.name} 
+	        	${createTooltipDiv(pokemon.ability.description)}
+	        </div>
+	        &nbsp-&nbsp 
+	        <div class = "tooltip">
+	        	Nature: ${pokemon.nature}
+	        	${createTooltipDiv("")}
+	        </div>
 	      </div>
 	      <div class="text-base">
 	        HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}
