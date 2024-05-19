@@ -147,11 +147,10 @@ let Stat;
 ;
 
 function createTooltipDiv(tip) {
-	const tooltip = document.createElement('div')
-	tooltip.classList.add('text-base')
-	tooltip.classList.add('tooltiptext')
-	tooltip.textContent = tip
-	return tooltip
+	const tooltipHtml = `
+		<div class="text-base tooltiptext">${tip}</div>
+	`
+	return tooltipHtml
 }
 
 let currentEnemyPage = 0;
@@ -234,7 +233,14 @@ function createOpacitySliderDiv(divId, initialValue = "100", min = "10", max = "
 // Current values: weaknesses, resistances, immunities
 function createTypeEffectivenessWrapper(typeEffectivenesses) {
 	let typesHTML = `
-		${Object.keys(typeEffectivenesses).map((effectiveness) => `
+		${Object.keys(typeEffectivenesses).map((effectiveness) => {
+			if (typeEffectivenesses[effectiveness].length === 0) return ''
+			const tooltipMap = {
+			  weaknesses: "Weak to",
+			  resistances: "Resists",
+			  immunities: "Immune to"
+			};
+			return `
 	      <div class="pokemon-${effectiveness} tooltip">
 
 	          ${typeEffectivenesses[effectiveness].map((type, counter) => `
@@ -250,9 +256,9 @@ function createTypeEffectivenessWrapper(typeEffectivenesses) {
 	                `</div>` 
 	              : ''}
 	          `).join('')}
-
+	          ${createTooltipDiv(tooltipMap[effectiveness] || "")}
 	      </div>
-	  `).join('')}
+	  `}).join('')}
   `
 
   return typesHTML
