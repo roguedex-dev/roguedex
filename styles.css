@@ -5,9 +5,9 @@
 
 .allies-team {
   margin: 0 auto;
+  padding: 0 auto;
   position: absolute;
-  top: 0
-  bottom: 0;
+  top: 0;
   right: 0;
   z-index: 1;
   display: flex;
@@ -15,7 +15,7 @@
 
 .enemy-team {
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 auto;
   position: absolute;
   top: 0;
   z-index: 1;
@@ -120,6 +120,8 @@
   font-size: var(--font-size);
   position: absolute;
   z-index: 1;
+  background-color: #fff;
+  max-width: 12vw;
 }
 
 .tooltip:hover .tooltiptext {
@@ -130,7 +132,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input[type='range'] {
       overflow: hidden;
-      width: 20vh;
+      width: min(20vh, 7.5vw);
       -webkit-appearance: none;
     }
     
@@ -163,4 +165,17 @@ input[type="range"] {
 
 .slider-wrapper {
   display: flex;
+}
+
+.running-status {
+  position: absolute;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  color: blue;
+  background-color: #ffffff50;
+}
+
+.hidden-ability {
+  color: gold;
 }

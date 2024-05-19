@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Rogue Dex",
-  "version": "2.4",
+  "version": "2.6",
   "permissions": [
     "activeTab",
     "webRequest",
@@ -20,13 +20,18 @@
   "content_scripts": [
     {
       "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
-      "js" : ["inject.js"],
+      "js" : [
+        "inject.js"
+      ],
       "run_at": "document_start",
       "all_frames": true
     },
     {
       "matches": ["https://pokerogue.net/*"],
-      "js" : ["content.js"],
+      "js" : [
+        "content.js", 
+        "libs/crypto-js.min.js"
+      ],
       "css": ["styles.css"]
     }
   ],
