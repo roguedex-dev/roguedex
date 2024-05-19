@@ -197,7 +197,7 @@ class PokemonMapperClass{
                     immunities: Array.from(typeEffectiveness.immunities),
                 },
                 ivs: pokemon.ivs,
-                ability: $this.I2A[pokemon.abilityIndex-1],
+                ability: $this.I2A[pokemon.abilityIndex],
                 nature: $this.I2N[pokemon.nature],
                 basePokemon: basePokemon,
                 baseId: $this.P2I[basePokemon],
