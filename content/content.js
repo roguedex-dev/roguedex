@@ -223,7 +223,7 @@ function createOpacitySliderDiv(divId, initialValue = "100", min = "10", max = "
     result.html = `
   		<div class="slider-wrapper">
   			<div class="text-base">Opacity:</div>
-  			<input type="range" min="${min}" max="${max}" value="${initialValue}" id="${result.id}">
+  			<input class="op-slider" type="range" min="${min}" max="${max}" value="${initialValue}" id="${result.id}">
   		</div>
   	`
     return result
@@ -307,6 +307,7 @@ async function createPokemonCardDiv(cardId, pokemon) {
     cardObj.slider = opacitySlider.id;
 
     return cardObj
+
 }
 
 function createWrapperDiv(divId) {
@@ -337,8 +338,12 @@ async function createCardsDiv(divId, pokemon) {
     newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
     document.body.appendChild(newDiv);
     document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
-    // document.getElementById(buttonsObj.idUp).addEventListener('click', changePage)
-    // document.getElementById(buttonsObj.idDown).addEventListener('click', changePage)
+    document.getElementById(buttonsObj.idUp).addEventListener('click', (event)=>{
+        changePage(event);
+    })
+    document.getElementById(buttonsObj.idDown).addEventListener('click', (event)=>{
+        changePage(event);
+    })
     return newDiv
     // let newDiv = createWrapperDiv(divId)
     // let buttonsDiv = createArrowButtonsDiv(divId)
