@@ -477,5 +477,3 @@ window["__EvolutionMap"] = {
     SNOM: {name: "FROSMOTH", val: 1},
     GIMMIGHOUL: {name: "GHOLDENGO", val: 1}
 };
-
-// export default EvolutionMap;

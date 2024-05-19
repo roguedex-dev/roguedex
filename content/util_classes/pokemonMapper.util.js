@@ -1,9 +1,3 @@
-// import Species from "./Pokemon_To_Id";
-// import EvolutionMap from "./PokemonEvolutions";
-// import WeatherMap from "./weatherMap";
-// import AbilityMap from "./abilityMap";
-// import NatureMap from "./natureMap";
-
 class PokemonMapperClass{
     constructor() {
         this.P2I = window.__Species;
@@ -20,16 +14,11 @@ class PokemonMapperClass{
     }
 
     static #init($this){
-        //let $this = this;
         $this.I2P = PokemonMapperClass.#calculateInverseMap($this.P2I);
         $this.I2W = PokemonMapperClass.#calculateInverseMap($this.W2I);
         $this.I2A = PokemonMapperClass.#calculateInverseMap($this.A2I);
         $this.I2N = PokemonMapperClass.#calculateInverseMap($this.N2I);
         $this.PrevoMap = PokemonMapperClass.#calcPrevolution($this.EvoMap);
-    // console.log($this.P2I);
-    // console.log($this.I2P);
-    // console.log($this.EvoMap);
-    // console.log($this.PrevoMap);
     }
 
     static #calculateInverseMap(map){
@@ -171,6 +160,32 @@ class PokemonMapperClass{
         return { weaknesses, resistances, immunities };
     }
 
+    async getPokemonAbility(pokemonId, abilityIndex) {
+        let pokeID = (this.I2P[pokemonId]).toLowerCase();
+        try {
+            const pokemonInfo = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeID}`);
+            const data = await pokemonInfo.json();
+
+            const abilityLength = data.abilities.length
+
+            if (abilityIndex >= abilityLength) {
+                abilityIndex = abilityLength - 1 // Pokerogue uses a "None" ability as padding when pokémon have less than 3.
+            }
+
+            const abilityName = data.abilities[abilityIndex].ability.name
+            const abilityInfo = await fetch(`https://pokeapi.co/api/v2/ability/${abilityName}`);
+            const abilityData = await abilityInfo.json();
+            return {
+                'name': abilityName.toUpperCase().replace('-', ' '),
+                'description': abilityData.flavor_text_entries[abilityData.flavor_text_entries.length - 1].flavor_text,
+                'isHidden': data.abilities[abilityIndex].is_hidden
+            }
+        } catch (error) {
+            console.error('Error fetching Pokémons ability:', error);
+            return null;
+        }
+    }
+
     async getPokemonArray(pokemonData, arena) {
         let $this = this;
         let pokemonArray = PokemonMapperClass.#mapPartyToPokemonArray(pokemonData);
@@ -197,7 +212,7 @@ class PokemonMapperClass{
                     immunities: Array.from(typeEffectiveness.immunities),
                 },
                 ivs: pokemon.ivs,
-                ability: $this.I2A[pokemon.abilityIndex],
+                ability: await $this.getPokemonAbility(pokemon.species, pokemon.abilityIndex),
                 nature: $this.I2N[pokemon.nature],
                 basePokemon: basePokemon,
                 baseId: $this.P2I[basePokemon],
@@ -277,7 +292,5 @@ class PokemonMapperClass{
     }
 }
 
-
-//const __PokemonMapper = new PokemonMapperClass();
 
 

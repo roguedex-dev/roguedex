@@ -29,8 +29,6 @@ function initUtilities(e) {
         } else {
             console.log("Error Loading Scripts :(")
         }
-        //console.log(`isReady has changed to: ${Utils.isReady}`);
-        // Additional logic to handle the change
     });
 }
 
@@ -142,7 +140,7 @@ let Stat;
     Stat[Stat["SPDEF"] = 4] = "SPDEF";
     Stat[Stat["SPD"] = 5] = "SPD";
 })(Stat || (Stat = {}));
-;
+
 
 function createTooltipDiv(tip) {
     const tooltip = document.createElement('div')
@@ -153,26 +151,46 @@ function createTooltipDiv(tip) {
 }
 
 // Current values: weaknesses, resistances, immunities
-function createTypeEffectivenessWrapper(effectiveness, types) {
-    const typeEffectivenessWrapper = document.createElement('div')
-    typeEffectivenessWrapper.classList.add(`pokemon-${effectiveness}`);
-    typeEffectivenessWrapper.classList.add('tooltip');
-    let counter = 0;
-    let block = document.createElement('div');
-    typeEffectivenessWrapper.appendChild(block)
-    types.forEach(type => {
-        if (counter % 3 === 0) {
-            block = document.createElement('div');
-            typeEffectivenessWrapper.appendChild(block)
-        }
-        const typeIcon = document.createElement('div');
-        typeIcon.style.backgroundImage = `url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')`;
-        typeIcon.className = 'type-icon';
-        block.appendChild(typeIcon)
-        counter += 1;
-    });
-    return typeEffectivenessWrapper
+function createTypeEffectivenessWrapper(typeEffectivenesses) {
+    let typesHTML = `
+		${Object.keys(typeEffectivenesses).map((effectiveness) => {
+        if (typeEffectivenesses[effectiveness].length === 0) return ''
+        const tooltipMap = {
+            weaknesses: "Weak to",
+            resistances: "Resists",
+            immunities: "Immune to"
+        };
+        return `
+	      <div class="pokemon-${effectiveness} tooltip">
+
+	          ${typeEffectivenesses[effectiveness].map((type, counter) => `
+	              ${/* The current html structure requires to wrap every third element in a div, the implementation here gets a bit ugly. */''}
+	              ${((counter + 1) % 3 === 1) ?
+            `<div>`
+            : ''}
+
+	              <div class="type-icon" style="background-image: url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-viii/sword-shield/${Types[type]}.png')"></div>
+	              
+	              ${/* Closing div, after every third element or when the arrays max length is reached. */''}
+	              ${((counter + 1) % 3 === 0) || ((counter + 1) === typeEffectivenesses[effectiveness].length) ?
+            `</div>`
+            : ''}
+	          `).join('')}
+	          ${createTooltipDiv(tooltipMap[effectiveness] || "")}
+	      </div>
+	  `
+    }).join('')}
+  `
+    return typesHTML
 }
+
+function createTooltipDiv(tip) {
+    const tooltipHtml = `
+		<div class="text-base tooltiptext">${tip}</div>
+	`
+    return tooltipHtml
+}
+
 
 const pages = {
     "enemies": 0,
@@ -182,48 +200,33 @@ const partySize = {
     "enemies": 0,
     "allies": 0
 }
-let currentEnemyPage = 0;
-let currentAllyPage = 0;
-let enemiesPokemon = [];
-let alliesPokemon = [];
 let weather = {};
 
-function createArrowButtonsDiv(divId) {
-    const buttonsDiv = document.createElement('div')
-    buttonsDiv.classList.add('arrow-button-wrapper')
-    const arrowUpButton = document.createElement('button')
-    const arrowDownButton = document.createElement('button')
-    arrowUpButton.classList.add('text-base')
-    arrowDownButton.classList.add('text-base')
-    arrowUpButton.classList.add('arrow-button')
-    arrowDownButton.classList.add('arrow-button')
-    arrowUpButton.textContent = "↑"
-    arrowDownButton.textContent = "↓"
-    arrowUpButton.id = `${divId}-up`
-    arrowDownButton.id = `${divId}-down`
-    arrowUpButton.addEventListener('click', changePage)
-    arrowDownButton.addEventListener('click', changePage)
-    buttonsDiv.appendChild(arrowUpButton)
-    buttonsDiv.appendChild(arrowDownButton)
-    return buttonsDiv
+function createArrowButtonsDiv(divId, upString, downString) {
+    let result = {};
+    result.idUp = `${divId}-up`
+    result.idDown = `${divId}-down`
+
+    result.html = `
+		<div class="arrow-button-wrapper">
+			<button class="text-base arrow-button" id="${result.idUp}">${upString}</button>
+			<button class="text-base arrow-button" id="${result.idDown}">${downString}</button>
+		</div>
+	`
+
+    return result
 }
 
-function createOpacitySliderDiv(divId, initialValue = "100") {
-    const sliderDiv = document.createElement('div')
-    sliderDiv.classList.add('slider-wrapper')
-    const opacityTextDiv = document.createElement('div')
-    opacityTextDiv.classList.add('text-base')
-    opacityTextDiv.textContent = "Opacity:"
-    const slider = document.createElement('input')
-    slider.type = "range"
-    slider.min = "10"
-    slider.max = "100"
-    slider.value = initialValue
-    slider.id = `${divId}-slider`
-    sliderDiv.appendChild(opacityTextDiv)
-    sliderDiv.appendChild(slider)
-    sliderDiv.addEventListener('input', changeOpacity)
-    return sliderDiv
+function createOpacitySliderDiv(divId, initialValue = "100", min = "10", max = "100") {
+    let result = {};
+    result.id = `${divId}-slider`
+    result.html = `
+  		<div class="slider-wrapper">
+  			<div class="text-base">Opacity:</div>
+  			<input type="range" min="${min}" max="${max}" value="${initialValue}" id="${result.id}">
+  		</div>
+  	`
+    return result
 }
 
 function changeOpacity(e) {
@@ -238,17 +241,15 @@ async function changePage(click) {
     const divId = buttonId.split("-")[0]
     const direction = buttonId.split("-")[1]
     if (direction === 'up') {
-        if(pages[divId] > 0){
+        if (pages[divId] > 0) {
             pages[divId] -= 1
-        }
-        else{
+        } else {
             pages[divId] = partySize[divId]
         }
     } else if (direction === 'down') {
-        if(pages[divId] < partySize[divId]) {
+        if (pages[divId] < partySize[divId]) {
             pages[divId] += 1
-        }
-        else{
+        } else {
             pages[divId] = partySize[divId]
         }
     }
@@ -256,60 +257,56 @@ async function changePage(click) {
     await initCreation(sessionData);
 }
 
-async function createPokemonCardDiv(divId, pokemon) {
-    console.log(pokemon);
-    const card = document.createElement('div');
-    card.classList.add('pokemon-card');
+async function createPokemonCardDiv(cardId, pokemon) {
+    let opacityRangeMin = 10;
+    let opacityRangeMax = 100;
+    let pokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    const opacitySlider = createOpacitySliderDiv(cardId, wrapperDivPositions[cardId].opacity, opacityRangeMin, opacityRangeMax);
+    const typeEffectivenessHTML = createTypeEffectivenessWrapper(pokemon.typeEffectiveness);
+    let cardHTML = `
+  	<div class="pokemon-cards">
+	    <div class="pokemon-card">
+	      ${opacitySlider.html}
+	      <div style="display: flex;">
+	        <div class="pokemon-icon">
+	            <img src="${pokemonImageUrl}">
+	        </div>
 
-    const opacitySliderDiv = createOpacitySliderDiv(divId, wrapperDivPositions[divId].opacity)
+					${/* Displays the 3 type effectiveness segemtns (weaknesses, resistances, immunities). */''}
+	        ${typeEffectivenessHTML}
+	        
+	      </div>
 
-    const infoRow = document.createElement('div');
-    infoRow.style.display = 'flex';
+	      <div class="text-base">
+	      	<div class="tooltip ${pokemon.ability.isHidden ? 'hidden-ability' : ''}">
+	        	Ability: ${pokemon.ability.name} 
+	        	${createTooltipDiv(pokemon.ability.description)}
+	        </div>
+	        &nbsp-&nbsp 
+	        <div class = "tooltip">
+	        	Nature: ${pokemon.nature}
+	        	${createTooltipDiv("")}
+	        </div>
+	      </div>
+	      <div class="text-base">
+	        HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}
+	      </div>
+	      <div class="text-base">
+	        SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}
+	      </div>
+	        
+	      ${(weather.type && weather.turnsLeft) ?
+        `<div class="text-base">Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}</div>`
+        : ''}
+	    </div>
+    </div>
+  `
 
-    const iconWrapper = document.createElement('div');
-    iconWrapper.className = 'pokemon-icon';
-    const icon = document.createElement('img');
-    icon.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    iconWrapper.appendChild(icon);
-    infoRow.appendChild(iconWrapper);
+    const cardObj = {}
+    cardObj.html = cardHTML;
+    cardObj.slider = opacitySlider.id;
 
-    console.log(pokemon);
-    const weaknessesWrapper = createTypeEffectivenessWrapper('weaknesses', pokemon.typeEffectiveness.weaknesses)
-    weaknessesWrapper.appendChild(createTooltipDiv('Weak to'))
-
-    const resistancesWrapper = createTypeEffectivenessWrapper('resistances', pokemon.typeEffectiveness.resistances)
-    resistancesWrapper.appendChild(createTooltipDiv('Resists'))
-
-    const immunitiesWrapper = createTypeEffectivenessWrapper('immunities', pokemon.typeEffectiveness.immunities)
-    immunitiesWrapper.appendChild(createTooltipDiv('Immune to'))
-
-    infoRow.appendChild(weaknessesWrapper)
-    infoRow.appendChild(resistancesWrapper)
-    infoRow.appendChild(immunitiesWrapper)
-
-    const extraInfoRow = document.createElement('div');
-    extraInfoRow.classList.add('text-base')
-    extraInfoRow.textContent = `Ability: ${pokemon.ability} - Nature: ${pokemon.nature}`;
-
-    const ivsRow = document.createElement('div');
-    ivsRow.classList.add('text-base');
-    ivsRow.textContent = `HP: ${pokemon.ivs[Stat["HP"]]}, ATK: ${pokemon.ivs[Stat["ATK"]]}, DEF: ${pokemon.ivs[Stat["DEF"]]}, SPE: ${pokemon.ivs[Stat["SPD"]]}, SPD: ${pokemon.ivs[Stat["SPDEF"]]}, SPA: ${pokemon.ivs[Stat["SPATK"]]}`;
-
-    let weatherRow = undefined
-    if (weather.type && weather.turnsLeft) {
-        weatherRow = document.createElement('div');
-        weatherRow.classList.add('text-base');
-        weatherRow.textContent = `Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}`
-    }
-
-    card.appendChild(opacitySliderDiv)
-    card.appendChild(infoRow)
-    card.appendChild(extraInfoRow)
-    card.appendChild(ivsRow)
-    if (weatherRow) {
-        card.appendChild(weatherRow)
-    }
-    return card
+    return cardObj
 }
 
 function createWrapperDiv(divId) {
@@ -327,17 +324,32 @@ function createWrapperDiv(divId) {
     return newDiv;
 }
 
+
 async function createCardsDiv(divId, pokemon) {
-    let newDiv = createWrapperDiv(divId)
-    let buttonsDiv = createArrowButtonsDiv(divId)
-    newDiv.appendChild(buttonsDiv)
-    const pokemonCards = document.createElement("div");
-    pokemonCards.className = "pokemon-cards"
-    const card = await createPokemonCardDiv(divId, pokemon);
-    pokemonCards.appendChild(card);
-    newDiv.appendChild(pokemonCards)
-    document.body.appendChild(newDiv)
+    let newDiv = createWrapperDiv(divId);
+    let divClass = divId === 'enemies' ? 'enemy-team' : 'allies-team'
+    const cardObj = await createPokemonCardDiv(divId, pokemon);
+    const buttonsObj = createArrowButtonsDiv(divId, "↑", "↓");
+    const cardsHTML = `
+  	${buttonsObj.html}
+  	${cardObj.html}
+  `;
+    newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
+    document.body.appendChild(newDiv);
+    document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
+    // document.getElementById(buttonsObj.idUp).addEventListener('click', changePage)
+    // document.getElementById(buttonsObj.idDown).addEventListener('click', changePage)
     return newDiv
+    // let newDiv = createWrapperDiv(divId)
+    // let buttonsDiv = createArrowButtonsDiv(divId)
+    // newDiv.appendChild(buttonsDiv)
+    // const pokemonCards = document.createElement("div");
+    // pokemonCards.className = "pokemon-cards"
+    // const card = await createPokemonCardDiv(divId, pokemon);
+    // pokemonCards.appendChild(card);
+    // newDiv.appendChild(pokemonCards)
+    // document.body.appendChild(newDiv)
+    // return newDiv
 }
 
 
@@ -377,6 +389,7 @@ async function scaleElements() {
     enemiesDiv.style.fontSize = `${16 * scaleFactor * scaleFactorMulti}px`;
     alliesDiv.style.fontSize = `${16 * scaleFactor * scaleFactorMulti}px`;
 }
+
 async function initCreation(sessionData) {
     deleteWrapperDivs();
     let extensionSettings = await Utils.LocalStorage.getExtensionSettings();
@@ -384,12 +397,12 @@ async function initCreation(sessionData) {
     if (extensionSettings.showEnemies) {
         await dataMapping("enemyParty", "enemies", sessionData);
     }
-    if(extensionSettings.showParty){
+    if (extensionSettings.showParty) {
         await dataMapping("party", "allies", sessionData);
     }
 }
 
-async function dataMapping(pokemonLocation, divId, sessionData){
+async function dataMapping(pokemonLocation, divId, sessionData) {
     await Utils.PokeMapper.getPokemonArray(sessionData[pokemonLocation], sessionData.arena).then(async (pokemonData) => {
         weather = pokemonData.hasOwnProperty('weather') ? pokemonData.weather : null;
         partySize[divId] = pokemonData.pokemon.length;
@@ -400,17 +413,16 @@ async function dataMapping(pokemonLocation, divId, sessionData){
     });
 }
 
-function determinePage(divId, pokemon){
-    if(pages[divId] >= pokemon.length){
+function determinePage(divId, pokemon) {
+    if (pages[divId] >= pokemon.length) {
         pages[divId] = pokemon.length - 1;
         return pages[divId];
-    }
-    else{
+    } else {
         return pages[divId];
     }
 }
 
-function extensionSettingsListener(){
+function extensionSettingsListener() {
     browserApi.storage.onChanged.addListener(async function (changes, namespace) {
         for (let [key, {oldValue, newValue}] of Object.entries(changes)) {
             if (key === 'showMinified') {
@@ -431,7 +443,6 @@ function extensionSettingsListener(){
         }
     });
 }
-
 
 
 function touchControlListener() {

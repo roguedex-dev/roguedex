@@ -1082,5 +1082,3 @@ window["__Species"] = {
     PALDEA_WOOPER: 8194,
     BLOODMOON_URSALUNA: 8901,
 };
-
-// export default Species;

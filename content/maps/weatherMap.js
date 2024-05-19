@@ -10,5 +10,3 @@ window["__WeatherMap"] = {
     HARSH_SUN: 8,
     STRONG_WINDS: 9
 };
-
-// export default WeatherMap;
