@@ -233,13 +233,11 @@ function createOpacitySliderDiv(divId, initialValue = "100", min = "10", max = "
 
 // Current values: weaknesses, resistances, immunities
 function createTypeEffectivenessWrapper(typeEffectivenesses) {
-	console.log(typeEffectivenesses)
-	console.log(Types)
 	let typesHTML = `
 		${Object.keys(typeEffectivenesses).map((effectiveness) => `
 	      <div class="pokemon-${effectiveness} tooltip">
 
-	          ${typeEffectivenesses[effectiveness].fill().map((type, counter) => `
+	          ${typeEffectivenesses[effectiveness].map((type, counter) => `
 	              ${/* The current html structure requires to wrap every third element in a div, the implementation here gets a bit ugly. */''}
 	              ${ ((counter + 1) % 3 === 1)  ? 
 	                `<div>` 
