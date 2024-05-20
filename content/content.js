@@ -341,43 +341,108 @@ function ivComparison(pokeIv, dexIv) {
 
 function getPokemonIcon(pokemon, divId) {
     const canvas = document.getElementById(`pokemon-icon_${divId}`);
-    const ctx = canvas.getContext('2d');
-    const parent = canvas.parentElement;
-    const image1 = new Image();
-    const image2 = new Image();
+    if(canvas) {
+        const ctx = canvas.getContext('2d');
+        const parent = canvas.parentElement;
+        const image1 = new Image();
+        const image2 = new Image();
+        const fusionImage = new Image();
 
-    const loadImage = (image, src) => {
-        return new Promise((resolve, reject) => {
-            image.onload = () => resolve(image);
-            image.onerror = () => reject(new Error(`Failed to load image from ${src}`));
-            image.src = src;
-        });
-    };
+        const loadImage = (image, src) => {
+            return new Promise((resolve, reject) => {
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error(`Failed to load image from ${src}`));
+                image.src = src;
+            });
+        };
 
-    const drawImages = () => {
-        const width = image1.width;
-        const height = image1.height;
-        const parentHeight = parent.clientHeight;
-        const canvasWidth = parentHeight * (width / height);
+        const drawSingleImage = (image) => {
+            const width = image.width;
+            const height = image.height;
+            const parentHeight = parent.clientHeight;
+            const canvasWidth = parentHeight * (width / height);
 
-        // Set canvas dimensions based on the parent's height to allow scaling
-        canvas.width = canvasWidth;
-        canvas.height = parentHeight;
+            // Set canvas dimensions based on the parent's height
+            canvas.width = canvasWidth;
+            canvas.height = parentHeight;
+
+            // Draw the full image
+            ctx.drawImage(image, 0, 0, width, height, 0, 0, canvasWidth, parentHeight);
+        };
+
+        const drawCombinedImages = () => {
+            const width = image1.width;
+            const height = image1.height;
+            const parentHeight = parent.clientHeight;
+            const canvasWidth = parentHeight * (width / height);
+
+            // Set canvas dimensions based on the parent's height
+            canvas.width = canvasWidth;
+            canvas.height = parentHeight;
+
+            // Draw the top half of the first image
+            ctx.drawImage(image1, 0, 0, width, height / 2, 0, 0, canvasWidth, parentHeight / 2);
+
+            // Draw the bottom half of the second image
+            ctx.drawImage(image2, 0, height / 2, width, height / 2, 0, parentHeight / 2, canvasWidth, parentHeight / 2);
+        };
+
+        const image1Src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+        const image2Src = pokemon.fusionId ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.fusionId}.png` : null;
 
         if (pokemon.fusionId) {
-            ctx.drawImage(image1, 0, 0, width, height / 2, 0, 0, canvasWidth, parentHeight / 2);
-            ctx.drawImage(image2, 0, height / 2, width, height / 2, 0, parentHeight / 2, canvasWidth, parentHeight / 2);
+            let fusionName = Utils.PokeMapper.capitalizeFirstLetter((Utils.PokeMapper.I2P[pokemon.fusionId]));
+            let pokeName = Utils.PokeMapper.capitalizeFirstLetter((Utils.PokeMapper.I2P[pokemon.id]));
+            chrome.runtime.sendMessage({
+                action: "fetchFusionImageHtml",
+                fusionId: fusionName,
+                pokemonId: pokeName
+            }, response => {
+                if (response.success) {
+                    const parser = new DOMParser();
+                    console.log(response.html);
+                    const doc = parser.parseFromString(response.html, 'text/html');
+                    const figure = doc.querySelector('figure.sprite.sprite-variant-main');
+                    console.log(figure);
+                    if (figure) {
+                        const img = figure.querySelector('img');
+                        if (img) {
+                            loadImage(fusionImage, img.src)
+                                .then(() => drawSingleImage(fusionImage))
+                                .catch(() => {
+                                    // Fallback to combined images method if fusion image fails to load
+                                    Promise.all([
+                                        loadImage(image1, image1Src),
+                                        loadImage(image2, image2Src)
+                                    ])
+                                        .then(drawCombinedImages)
+                                        .catch(error => console.error(error));
+                                });
+                            return;
+                        }
+                    }
+                }
+                // Fallback to combined images method if fusion image not found
+                Promise.all([
+                    loadImage(image1, image1Src),
+                    loadImage(image2, image2Src)
+                ])
+                    .then(drawCombinedImages)
+                    .catch(error => console.error(error));
+            });
         } else {
-            ctx.drawImage(image1, 0, 0, width, height, 0, 0, canvasWidth, parentHeight);
+            // If fusionId is null, just load and display the single image
+            loadImage(image1, image1Src)
+                .then(drawSingleImage)
+                .catch(error => console.error(error));
         }
-    };
-    const image1Src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    const image2Src = pokemon.fusionId ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.fusionId}.png` : null;
-    loadImage(image1, image1Src)
-        .then(() => image2Src ? loadImage(image2, image2Src) : null)
-        .then(drawImages)
-        .catch(error => console.error(error));
+    }
+    console.log(pokemon);
 }
+
+
+
+
 
 
 
@@ -600,14 +665,45 @@ function extensionSettingsListener() {
 }
 
 
-function touchControlListener() {
-    const touchControlsElement = document.getElementById('touchControls')
-    if (touchControlsElement) {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(async (mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
-                    const newValue = touchControlsElement.getAttribute('data-ui-mode');
-                    console.log('New data-ui-mode:', newValue);
+// function touchControlListener() {
+//     const touchControlsElement = document.getElementById('touchControls');
+//     console.log("Touch control listener called");
+//     if (touchControlsElement) {
+//         const observer = new MutationObserver((mutations) => {
+//             mutations.forEach(async (mutation) => {
+//                 if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
+//                     const newValue = touchControlsElement.getAttribute('data-ui-mode');
+//                     console.log('New data-ui-mode:', newValue);
+//                     if (newValue === "MESSAGE" || newValue === "COMMAND" || newValue === "CONFIRM") {
+//                         Utils.LocalStorage.setSessionData();
+//                         let sessionData = Utils.LocalStorage.getSessionData();
+//                         await initCreation(sessionData);
+//                     }
+//                     if (newValue === "SAVE_SLOT") {
+//                         Utils.LocalStorage.clearAllSessionData();
+//                     }
+//                     if (newValue === "SAVE_SLOT" || newValue === "TITLE" || newValue === "MODIFIER_SELECT" || newValue === "STARTER_SELECT") {
+//                         deleteWrapperDivs()
+//                     }
+//                 }
+//             });
+//         });
+//
+//         window.addEventListener('resize', scaleElements);
+//         observer.observe(touchControlsElement, {attributes: true});
+//     }
+// }
+
+function listenForDataUiModeChange() {
+    function observeTouchControls() {
+        const touchControlsElement = document.getElementById('touchControls');
+        if (touchControlsElement) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach(async (mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-ui-mode') {
+                        const newValue = touchControlsElement.getAttribute('data-ui-mode');
+                        console.log('New value:', newValue);
+                        // Existing logic for handling data-ui-mode changes
                     if (newValue === "MESSAGE" || newValue === "COMMAND" || newValue === "CONFIRM") {
                         Utils.LocalStorage.setSessionData();
                         let sessionData = Utils.LocalStorage.getSessionData();
@@ -619,12 +715,22 @@ function touchControlListener() {
                     if (newValue === "SAVE_SLOT" || newValue === "TITLE" || newValue === "MODIFIER_SELECT" || newValue === "STARTER_SELECT") {
                         deleteWrapperDivs()
                     }
-                }
-            });
-        });
 
-        window.addEventListener('resize', scaleElements);
-        observer.observe(touchControlsElement, {attributes: true});
+                    }
+                });
+            });
+
+            observer.observe(touchControlsElement, { attributes: true });
+            console.log('Touch control listener called');
+        } else {
+            console.error('Element with ID "touchControls" not found.');
+            // Retry after a short delay if the element might be added later
+            setTimeout(observeTouchControls, 1000);
+        }
     }
+
+    observeTouchControls();
 }
+
+listenForDataUiModeChange();
 

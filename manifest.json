@@ -1,0 +1,65 @@
+{
+  "manifest_version": 2,
+  "name": "Rogue Dex",
+  "version": "2.6",
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "storage",
+    "https://pokerogue.net/*",
+    "https://api.pokerogue.net/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{46029ed0-cb54-4130-8105-fcbbed40adc1}"
+    }
+  },
+  "options_page": "options/options.html",
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": false
+  },
+  "browser_action": {
+    "default_popup": "options/options.html",
+    "default_icon": "./RogueDex.png",
+    "default_title": "RogueDex"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
+      "js" : [
+        "inject.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://pokerogue.net/*"],
+      "js" : [
+        "content/utils.js",
+        "libs/crypto-js.min.js",
+        "content/maps/abilityMap.js",
+        "content/maps/natureMap.js",
+        "content/maps/Pokemon_To_Id.js",
+        "content/maps/weatherMap.js",
+        "content/maps/PokemonEvolutions.js",
+        "content/util_classes/pokemonMapper.util.js",
+        "content/util_classes/localStorage.util.js",
+        "content/content.js"
+      ],
+      "type": "module",
+      "css": ["styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    "inject.js",
+    "injected.js",
+    "content/*",
+    "fonts/*",
+    "images/*"
+  ]
+}

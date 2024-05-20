@@ -70,16 +70,29 @@ class PokemonMapperClass{
     }
 
     static async #getPokeType(id) {
-        try {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-            const data = await response.json();
-            const types = data.types.map(type => type.type.name);
-            return types;
-        } catch (error) {
-            console.error('Error fetching Pokémon type:', error);
-            return null;
+        console.log(id);
+        const maxRetries = 3;
+        let attempts = 0;
+        while (attempts < maxRetries) {
+            try {
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const types = data.types.map(type => type.type.name);
+                return types;
+            } catch (error) {
+                attempts += 1;
+                console.error(`Attempt ${attempts} - Error fetching Pokémon type:`, error);
+                if (attempts >= maxRetries) {
+                    console.error('Max retries reached. Failed to fetch Pokémon type.');
+                    return null;
+                }
+            }
         }
     }
+
 
     static async #getPokemonTypeEffectiveness($this, id) {
         const types = await PokemonMapperClass.#getPokeType(id);

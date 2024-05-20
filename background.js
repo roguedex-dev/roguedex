@@ -577,33 +577,63 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
   })
 }
 
-browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  // Happens when loading a savegame or continuing an old run
-  if (request.type == 'BG_GET_SAVEDATA') {
-    const savedata = request.data
-    slotId = request.slotId
-    console.log("Received save data", savedata)
-    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.enemyParty), savedata.arena, "UPDATE_ENEMIES_DIV")
-    appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.party), savedata.arena, "UPDATE_ALLIES_DIV")
-  }
+// browserApi.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+//   // Happens when loading a savegame or continuing an old run
+//   if (request.type == 'BG_GET_SAVEDATA') {
+//     const savedata = request.data
+//     slotId = request.slotId
+//     console.log("Received save data", savedata)
+//     appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.enemyParty), savedata.arena, "UPDATE_ENEMIES_DIV")
+//     appendPokemonArrayToDiv(mapPartyToPokemonArray(savedata.party), savedata.arena, "UPDATE_ALLIES_DIV")
+//   }
+// });
+
+browserApi.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "fetchFusionImageHtml") {
+        const fusionUrl = `https://if.daena.me/find/?head=${request.pokemonId}&body=${request.fusionId}`;
+
+        fetch(fusionUrl, { method: 'GET', redirect: 'follow' })
+            .then(response => {
+                if (response.status === 307 || response.status === 200) {
+                    return fetch(response.url).then(res => res.text());
+                } else {
+                    throw new Error(`Unexpected status code: ${response.status}`);
+                }
+            })
+            .then(html => {
+                sendResponse({ success: true, html: html });
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                sendResponse({ success: false, error: error.message });
+            });
+
+        // Return true to indicate you wish to send a response asynchronously
+        return true;
+    }
 });
 
-browserApi.webRequest.onBeforeRequest.addListener(
-  function(details) {
-    if (details.method === 'POST') {
-        try {
-          let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
-          console.log("POST Session data:", sessionData)
-          if (details.url.includes("updateall")) sessionData = sessionData.session
-          appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
-          appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
-        } catch (e) {
-            console.error("Error while intercepting web request: ", e)
-        }
-    }
-  },
-  {
-    urls: ['https://api.pokerogue.net/savedata/update?datatype=1*', 'https://api.pokerogue.net/savedata/updateall']
-  },
-  ["requestBody"]
-)
+
+
+
+
+
+// browserApi.webRequest.onBeforeRequest.addListener(
+//   function(details) {
+//     if (details.method === 'POST') {
+//         try {
+//           let sessionData = JSON.parse(new TextDecoder().decode(details.requestBody.raw[0].bytes))
+//           console.log("POST Session data:", sessionData)
+//           if (details.url.includes("updateall")) sessionData = sessionData.session
+//           appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.enemyParty), sessionData.arena, "UPDATE_ENEMIES_DIV")
+//           appendPokemonArrayToDiv(mapPartyToPokemonArray(sessionData.party), sessionData.arena, "UPDATE_ALLIES_DIV")
+//         } catch (e) {
+//             console.error("Error while intercepting web request: ", e)
+//         }
+//     }
+//   },
+//   {
+//     urls: ['https://api.pokerogue.net/savedata/update?datatype=1*', 'https://api.pokerogue.net/savedata/updateall']
+//   },
+//   ["requestBody"]
+// )
