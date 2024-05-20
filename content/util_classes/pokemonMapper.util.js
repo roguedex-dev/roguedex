@@ -63,7 +63,9 @@ class PokemonMapperClass{
             ivs: pokemon.ivs,
             pokerus: pokemon.pokerus,
             shiny: pokemon.shiny,
-            variant: pokemon.variant
+            variant: pokemon.variant,
+            fusionSpecies: (pokemon.hasOwnProperty('fusionSpecies')) ? pokemon.fusionSpecies : null,
+            fusionAbilityIndex: pokemon.fusionAbilityIndex,
         }));
     }
 
@@ -160,8 +162,17 @@ class PokemonMapperClass{
         return { weaknesses, resistances, immunities };
     }
 
-    async getPokemonAbility(pokemonId, abilityIndex) {
-        let pokeID = (this.I2P[pokemonId]).toLowerCase();
+    async getPokemonAbility(pokemonId, pokemonAbilityIndex, fusionId, fusionAbilityIndex) {
+        let pokeID;
+        let abilityIndex;
+        if(fusionId){
+            pokeID = (this.I2P[fusionId]).toLowerCase();
+            abilityIndex = fusionAbilityIndex;
+        }
+        else{
+            pokeID = (this.I2P[pokemonId]).toLowerCase();
+            abilityIndex = pokemonAbilityIndex;
+        }
         try {
             const pokemonInfo = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeID}`);
             const data = await pokemonInfo.json();
@@ -186,9 +197,15 @@ class PokemonMapperClass{
         }
     }
 
+    capitalizeFirstLetter(string) {
+        string = string.toLowerCase();
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     async getPokemonArray(pokemonData, arena) {
         let $this = this;
         let pokemonArray = PokemonMapperClass.#mapPartyToPokemonArray(pokemonData);
+        console.log(pokemonArray);
         let frontendPokemonArray = [];
         let weather = {};
 
@@ -203,16 +220,17 @@ class PokemonMapperClass{
             const pokemonId = $this.I2P[$this.convertPokemonId(pokemon.species)].toLocaleLowerCase();
             const typeEffectiveness = await PokemonMapperClass.#getPokemonTypeEffectiveness($this, pokemonId);
             let basePokemon = $this.findBasePokemon($this.I2P[pokemon.species]);
+            let name = $this.getPokemonName(pokemon);
             return {
                 id: pokemon.species,
-                name: $this.I2P[pokemon.species],
+                name: $this.capitalizeFirstLetter(name.toUpperCase()),
                 typeEffectiveness: {
                     weaknesses: Array.from(typeEffectiveness.weaknesses),
                     resistances: Array.from(typeEffectiveness.resistances),
                     immunities: Array.from(typeEffectiveness.immunities),
                 },
                 ivs: pokemon.ivs,
-                ability: await $this.getPokemonAbility(pokemon.species, pokemon.abilityIndex),
+                ability: await $this.getPokemonAbility(pokemon.species, pokemon.abilityIndex, pokemon.fusionSpecies, pokemon.fusionAbilityIndex),
                 nature: $this.I2N[pokemon.nature],
                 basePokemon: basePokemon,
                 baseId: $this.P2I[basePokemon],
@@ -222,6 +240,77 @@ class PokemonMapperClass{
         frontendPokemonArray = await Promise.all(pokemonPromises);
 
         return { pokemon: frontendPokemonArray, weather: weather };
+    }
+
+    getPokemonName(pokemon){
+        if(pokemon.fusionSpecies){
+            let nameA = this.I2P[pokemon.species];
+            let nameB = this.I2P[pokemon.fusionSpecies];
+            return this.getFusedSpeciesName(nameA, nameB);
+            //getFusedSpeciesName
+        }
+        else{
+            return this.I2P[pokemon.species]
+        }
+
+    }
+
+     getFusedSpeciesName(speciesAName, speciesBName) {
+        const fragAPattern = /([a-z]{2}.*?[aeiou(?:y$)\-\']+)(.*?)$/i;
+        const fragBPattern = /([a-z]{2}.*?[aeiou(?:y$)\-\'])(.*?)$/i;
+
+        const [ speciesAPrefixMatch, speciesBPrefixMatch ] = [ speciesAName, speciesBName ].map(n => /^(?:[^ ]+) /.exec(n));
+        const [ speciesAPrefix, speciesBPrefix ] = [ speciesAPrefixMatch, speciesBPrefixMatch ].map(m => m ? m[0] : '');
+
+        if (speciesAPrefix)
+            speciesAName = speciesAName.slice(speciesAPrefix.length);
+        if (speciesBPrefix)
+            speciesBName = speciesBName.slice(speciesBPrefix.length);
+
+        const [ speciesASuffixMatch, speciesBSuffixMatch ] = [ speciesAName, speciesBName ].map(n => / (?:[^ ]+)$/.exec(n));
+        const [ speciesASuffix, speciesBSuffix ] = [ speciesASuffixMatch, speciesBSuffixMatch ].map(m => m ? m[0] : '');
+
+        if (speciesASuffix)
+            speciesAName = speciesAName.slice(0, -speciesASuffix.length);
+        if (speciesBSuffix)
+            speciesBName = speciesBName.slice(0, -speciesBSuffix.length);
+
+        const splitNameA = speciesAName.split(/ /g);
+        const splitNameB = speciesBName.split(/ /g);
+
+        let fragAMatch = fragAPattern.exec(speciesAName);
+        let fragBMatch = fragBPattern.exec(speciesBName);
+        let fragA;
+        let fragB;
+
+        fragA = splitNameA.length === 1
+            ? fragAMatch ? fragAMatch[1] : speciesAName
+            : splitNameA[splitNameA.length - 1];
+
+        if (splitNameB.length === 1) {
+            if (fragBMatch) {
+                const lastCharA = fragA.slice(fragA.length - 1);
+                const prevCharB = fragBMatch[1].slice(fragBMatch.length - 1);
+                fragB = (/[\-']/.test(prevCharB) ? prevCharB : '') + fragBMatch[2] || prevCharB;
+                if (lastCharA === fragB[0]) {
+                    if (/[aiu]/.test(lastCharA))
+                        fragB = fragB.slice(1);
+                    else {
+                        const newCharMatch = new RegExp(`[^${lastCharA}]`).exec(fragB);
+                        if (newCharMatch?.index > 0)
+                            fragB = fragB.slice(newCharMatch.index);
+                    }
+                }
+            } else
+                fragB = speciesBName;
+        } else
+            fragB = splitNameB[splitNameB.length - 1];
+
+        if (splitNameA.length > 1)
+            fragA = `${splitNameA.slice(0, splitNameA.length - 1).join(' ')} ${fragA}`;
+
+        fragB = `${fragB.slice(0, 1).toLowerCase()}${fragB.slice(1)}`;
+        return `${speciesAPrefix || speciesBPrefix}${fragA}${fragB}${speciesBSuffix || speciesASuffix}`;
     }
 
     convertPokemonId(pokemonId) {

@@ -202,13 +202,16 @@ const partySize = {
 }
 let weather = {};
 
-function createArrowButtonsDiv(divId, upString, downString) {
+function createArrowButtonsDiv(divId, upString, downString, showMinified) {
+    let sizes = "2.5em !important"
+    if(showMinified){
+        sizes = "1em !important"
+    }
     let result = {};
     result.idUp = `${divId}-up`
     result.idDown = `${divId}-down`
-
     result.html = `
-		<div class="arrow-button-wrapper">
+		<div class="arrow-button-wrapper" style="font-size: ${sizes}">
 			<button class="text-base arrow-button" id="${result.idUp}">${upString}</button>
 			<button class="text-base arrow-button" id="${result.idDown}">${downString}</button>
 		</div>
@@ -271,8 +274,6 @@ async function createPokemonCardDiv(cardId, pokemon) {
 	        <div class="pokemon-icon">
 	            <img src="${pokemonImageUrl}">
 	        </div>
-
-					${/* Displays the 3 type effectiveness segemtns (weaknesses, resistances, immunities). */''}
 	        ${typeEffectivenessHTML}
 	        
 	      </div>
@@ -307,7 +308,86 @@ async function createPokemonCardDiv(cardId, pokemon) {
     cardObj.slider = opacitySlider.id;
 
     return cardObj
+}
 
+function generateIVsHTML(pokemon, dexIvs){
+    let fullHTML = ``;
+    for (let i in pokemon.ivs) {
+        let curIV = pokemon.ivs[i];
+        fullHTML += `<div class="stat-p">${Stat[i]}:&nbsp;<div class="stat-c" style="color: ${getColor(curIV)}">${curIV}${ivComparison(curIV, dexIvs[i])}</div>&nbsp;&nbsp;</div>`;
+        // ivsRow.appendChild(statDiv);
+    }
+    return fullHTML;
+}
+
+function ivComparison(pokeIv, dexIv) {
+    let iconA = "";
+    let colorS = "#00FF00";
+    if(pokeIv > dexIv){
+        iconA = "↑";
+        colorS = "#00FF00";
+    }
+    else if (pokeIv < dexIv) {
+        iconA = "↓";
+        colorS = "#FF0000";
+    }
+    else{
+        iconA = "-";
+        colorS = "#FFFF00";
+    }
+    let returnHTML = `<div class="stat-icon" style="color: ${colorS} !important; opacity: 0.3">${iconA}</div>`
+    return returnHTML;
+}
+
+async function createPokemonCardDiv_minified(cardId, pokemon) {
+    let savedData =  Utils.LocalStorage.getPlayerData();
+    let dexData = savedData["dexData"];
+    let dexIvs = dexData[pokemon.baseId]["ivs"];
+    console.log(savedData);
+    let opacityRangeMin = 10;
+    let opacityRangeMax = 100;
+    let pokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    const opacitySlider = createOpacitySliderDiv(cardId, wrapperDivPositions[cardId].opacity, opacityRangeMin, opacityRangeMax);
+    const typeEffectivenessHTML = createTypeEffectivenessWrapper(pokemon.typeEffectiveness);
+    let ivsGeneratedHTML = generateIVsHTML(pokemon, dexIvs);
+    //${opacitySlider.html}
+    // <div style="display: flex;">
+    //     <div class="pokemon-icon">
+    //         <img src="${pokemonImageUrl}">
+    //     </div>
+    //     // ${typeEffectivenessHTML}
+    //
+    // </div>
+    let cardHTML = `
+  	<div class="pokemon-cards">
+	    <div class="pokemon-card">
+	        <div class="text-base centered-flex">${pokemon.name}</div>
+	      <div class="text-base centered-flex">
+	      	<div class="tooltip ${pokemon.ability.isHidden ? 'hidden-ability' : ''}">
+	        	Ability: ${pokemon.ability.name} 
+	        	${createTooltipDiv(pokemon.ability.description)}
+	        </div>
+	        &nbsp-&nbsp 
+	        <div class = "tooltip">
+	        	Nature: ${pokemon.nature}
+	        	${createTooltipDiv("")}
+	        </div>
+	      </div>
+	      <div class="text-base stat-cont">
+	        ${ivsGeneratedHTML}
+	      </div>
+	        
+	      ${(weather.type && weather.turnsLeft) ?
+        `<div class="text-base">Weather: ${weather.type}, Turns Left: ${weather.turnsLeft}</div>`
+        : ''}
+	    </div>
+    </div>
+  `
+
+    const cardObj = {}
+    cardObj.html = cardHTML;
+    //cardObj.slider = opacitySlider.id;
+    return cardObj
 }
 
 function createWrapperDiv(divId) {
@@ -325,36 +405,62 @@ function createWrapperDiv(divId) {
     return newDiv;
 }
 
+function getColor(num) {
+    if (num < 0 || num > 31) {
+        throw new Error('Number must be between 0 and 31');
+    }
+
+    // Calculate the red component: It decreases as 'num' increases
+    let red = Math.floor(255 * (1 - num / 31));
+    // Calculate the green component: It increases as 'num' increases
+    let green = Math.floor(255 * (num / 31));
+    // Blue component is always 0 for a red to green gradient
+    let blue = 0;
+
+    // Convert each color component to a hex string and pad with 0 if necessary
+    let redHex = red.toString(16).padStart(2, '0');
+    let greenHex = green.toString(16).padStart(2, '0');
+    let blueHex = blue.toString(16).padStart(2, '0');
+
+    // Combine the hex values and return the result
+    return `#${redHex}${greenHex}${blueHex}`;
+}
+
+
+async function chooseCardType(divId, pokemon, minified){
+    if(minified){
+        return cardsObj = await createPokemonCardDiv_minified(divId, pokemon);
+    }
+    else{
+        return cardsObj = await createPokemonCardDiv(divId, pokemon);
+    }
+}
 
 async function createCardsDiv(divId, pokemon) {
+    let extensionSettings = await Utils.LocalStorage.getExtensionSettings();
     let newDiv = createWrapperDiv(divId);
-    let divClass = divId === 'enemies' ? 'enemy-team' : 'allies-team'
-    const cardObj = await createPokemonCardDiv(divId, pokemon);
-    const buttonsObj = createArrowButtonsDiv(divId, "↑", "↓");
-    const cardsHTML = `
+   return await chooseCardType(divId, pokemon, extensionSettings.showMinified).then(async (cardObj) =>{
+       const buttonsObj = createArrowButtonsDiv(divId, "↑", "↓", extensionSettings.showMinified);
+       const cardsHTML = `
   	${buttonsObj.html}
   	${cardObj.html}
   `;
-    newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
-    document.body.appendChild(newDiv);
-    document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
-    document.getElementById(buttonsObj.idUp).addEventListener('click', (event)=>{
-        changePage(event);
+       newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
+       document.body.appendChild(newDiv);
+       if(cardObj.slider) {
+           document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
+       }
+       document.getElementById(buttonsObj.idUp).addEventListener('click', (event)=>{
+           changePage(event);
+       })
+       document.getElementById(buttonsObj.idDown).addEventListener('click', (event)=>{
+           changePage(event);
+       })
+       return newDiv
     })
-    document.getElementById(buttonsObj.idDown).addEventListener('click', (event)=>{
-        changePage(event);
-    })
-    return newDiv
-    // let newDiv = createWrapperDiv(divId)
-    // let buttonsDiv = createArrowButtonsDiv(divId)
-    // newDiv.appendChild(buttonsDiv)
-    // const pokemonCards = document.createElement("div");
-    // pokemonCards.className = "pokemon-cards"
-    // const card = await createPokemonCardDiv(divId, pokemon);
-    // pokemonCards.appendChild(card);
-    // newDiv.appendChild(pokemonCards)
-    // document.body.appendChild(newDiv)
-    // return newDiv
+
+
+
 }
 
 
@@ -398,7 +504,6 @@ async function scaleElements() {
 async function initCreation(sessionData) {
     deleteWrapperDivs();
     let extensionSettings = await Utils.LocalStorage.getExtensionSettings();
-    console.log(extensionSettings);
     if (extensionSettings.showEnemies) {
         await dataMapping("enemyParty", "enemies", sessionData);
     }

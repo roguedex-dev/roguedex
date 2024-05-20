@@ -22,6 +22,10 @@
   display: flex;
 }
 
+.stat-cont{
+
+}
+
 .pokemon-cards {
   display: flex;
   flex-wrap: nowrap;
@@ -106,8 +110,13 @@
 .arrow-button-wrapper {
   display: grid;
 }
-.arrow-button {
-  font-size: 2.5em;
+/*.arrow-button {*/
+/*  font-size: 2.5em;*/
+/*}*/
+
+.centered-flex{
+  display: flex;
+    justify-content: center;
 }
 
 .tooltip .tooltiptext {

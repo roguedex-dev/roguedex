@@ -65,6 +65,22 @@ class LocalStorageClass {
         });
     }
 
+    getPlayerData(){
+        let localStorageData = localStorage.getItem(this.getDataKey('data_'));
+        const decryptedString = CryptoJS.AES.decrypt(localStorageData, this.saveKey).toString(CryptoJS.enc.Utf8);
+        return JSON.parse(decryptedString);
+    }
+
+    getDataKey(matchString) {
+        const keys = Object.keys(localStorage);
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (key.includes(matchString)) {
+                return key;
+            }
+        }
+    }
+
 }
 
 
