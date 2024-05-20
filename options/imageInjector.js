@@ -23,7 +23,8 @@ export default class ImageInjector {
 
             parts.forEach(part => {
                 const img = new Image();
-                const url = this.browserApi.extension.getURL(`images/menu/${menuType}/${part}.png`);
+                let prefix = (this.browserApi === chrome) ? 'chrome-extension' : 'moz-extension';
+                const url = `${prefix}://${this.extensionId}/images/menu/${menuType}/${part}.png`;
                 img.src = url;
                 this.preloadedImages[menuType][part] = img;
             });

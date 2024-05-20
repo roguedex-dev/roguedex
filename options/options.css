@@ -186,6 +186,8 @@ body {
     font-family: 'PKMNems';
 }
 
+
+
 .setting-label.focus {
     color: var(--yellow-main); /* Focused color */
     text-shadow: 2px 2px 0 var(--red-sub);

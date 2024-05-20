@@ -1,45 +1,48 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Rogue Dex",
   "version": "2.6",
   "permissions": [
     "activeTab",
     "webRequest",
     "storage",
-    "https://pokerogue.net/*",
-    "https://api.pokerogue.net/*"
+    "https://if.daena.me/*",
+    "https://cdn.daena.me/*"
   ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{46029ed0-cb54-4130-8105-fcbbed40adc1}"
-    }
-  },
+  "host_permissions": [
+    "https://pokerogue.net/*",
+    "https://api.pokerogue.net/*",
+    "https://if.daena.me/*",
+    "https://cdn.daena.me/*"
+  ],
   "options_page": "options/options.html",
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": false
   },
-  "browser_action": {
-    "default_popup": "options/options.html",
-    "default_icon": "./RogueDex.png",
-    "default_title": "RogueDex"
+  "action": {
+    "default_popup": "options/options.html"
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": true
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
-      "js" : [
+      "matches": [
+        "https://api.pokerogue.net/*",
+        "https://pokerogue.net/*"
+      ],
+      "js": [
         "inject.js"
       ],
       "run_at": "document_start",
       "all_frames": true
     },
     {
-      "matches": ["https://pokerogue.net/*"],
-      "js" : [
+      "matches": [
+        "https://pokerogue.net/*"
+      ],
+      "js": [
         "content/utils.js",
         "libs/crypto-js.min.js",
         "content/maps/abilityMap.js",
@@ -52,14 +55,24 @@
         "content/content.js"
       ],
       "type": "module",
-      "css": ["styles.css"]
+      "css": [
+        "styles.css"
+      ]
     }
   ],
   "web_accessible_resources": [
-    "inject.js",
-    "injected.js",
-    "content/*",
-    "fonts/*",
-    "images/*"
+    {
+      "resources": [
+        "inject.js",
+        "injected.js",
+        "content/*",
+        "images/*",
+        "fonts/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "extension_ids": []
+    }
   ]
 }

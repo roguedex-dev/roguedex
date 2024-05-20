@@ -24,6 +24,27 @@ class LocalStorageClass {
         }, 1000)
     }
 
+    saveImageToCache(key, imageData) {
+        try {
+            localStorage.setItem(`img_cache_${key}`, imageData);
+        } catch (e) {
+            console.error("Failed to save image to cache", e);
+        }
+    }
+
+    getImageFromCache(key) {
+        return localStorage.getItem(`img_cache_${key}`);
+    }
+
+    clearImageCache() {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('img_cache_')) {
+                localStorage.removeItem(key);
+            }
+        });
+    }
+
     setSessionData(){
         let currentSessionData = {}
         for (let key in localStorage) {

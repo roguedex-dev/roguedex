@@ -22,24 +22,24 @@
     };
 })(XMLHttpRequest);
 
-const { fetch: origFetch } = window;
-window.fetch = async (...args) => {
-    const response = await origFetch(...args);
-    if (!response.url.includes('api.pokerogue.net/savedata/session?slot') &&
-        !response.url.includes('api.pokerogue.net/savedata/updateall')) return response
-
-    let sessionSlotRegex = /.*\/session\?slot=(\d+).*/ 
-    let slotId = -1
-    if (sessionSlotRegex.test(response.url)){
-        slotId = sessionSlotRegex.exec(response.url)[1]
-    } 
-    response
-        .clone()
-        .json() // maybe json(), text(), blob()
-        .then(data => {
-            window.postMessage({ type: 'GET_SAVEDATA', data: data, slotId: slotId }, '*'); // send to content script
-            //window.postMessage({ type: 'fetch', data: URL.createObjectURL(data) }, '*'); // if a big media file, can createObjectURL before send to content script
-        })
-        .catch(err => console.error(err));
-    return response;
-};
+// const { fetch: origFetch } = window;
+// window.fetch = async (...args) => {
+//     const response = await origFetch(...args);
+//     if (!response.url.includes('api.pokerogue.net/savedata/session?slot') &&
+//         !response.url.includes('api.pokerogue.net/savedata/updateall')) return response
+//
+//     let sessionSlotRegex = /.*\/session\?slot=(\d+).*/
+//     let slotId = -1
+//     if (sessionSlotRegex.test(response.url)){
+//         slotId = sessionSlotRegex.exec(response.url)[1]
+//     }
+//     response
+//         .clone()
+//         .json() // maybe json(), text(), blob()
+//         .then(data => {
+//             window.postMessage({ type: 'GET_SAVEDATA', data: data, slotId: slotId }, '*'); // send to content script
+//             //window.postMessage({ type: 'fetch', data: URL.createObjectURL(data) }, '*'); // if a big media file, can createObjectURL before send to content script
+//         })
+//         .catch(err => console.error(err));
+//     return response;
+// };

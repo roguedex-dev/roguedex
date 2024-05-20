@@ -134,6 +134,14 @@
   visibility: visible;
 }
 
+.image-overlay{
+  position: absolute;
+  left: 20px;
+  top: -30px;
+  width: 96px;
+  height: 96px;
+}
+
 /* Slider settings */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input[type='range'] {
