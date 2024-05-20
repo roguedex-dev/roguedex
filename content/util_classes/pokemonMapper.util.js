@@ -234,6 +234,7 @@ class PokemonMapperClass{
                 nature: $this.I2N[pokemon.nature],
                 basePokemon: basePokemon,
                 baseId: $this.P2I[basePokemon],
+                fusionId: pokemon.fusionSpecies,
             };
         });
 

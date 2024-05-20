@@ -263,6 +263,7 @@ async function changePage(click) {
 async function createPokemonCardDiv(cardId, pokemon) {
     let opacityRangeMin = 10;
     let opacityRangeMax = 100;
+    // getPokemonIcon(pokemon);
     let pokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
     const opacitySlider = createOpacitySliderDiv(cardId, wrapperDivPositions[cardId].opacity, opacityRangeMin, opacityRangeMax);
     const typeEffectivenessHTML = createTypeEffectivenessWrapper(pokemon.typeEffectiveness);
@@ -271,9 +272,8 @@ async function createPokemonCardDiv(cardId, pokemon) {
 	    <div class="pokemon-card">
 	      ${opacitySlider.html}
 	      <div style="display: flex;">
-	        <div class="pokemon-icon">
-	            <img src="${pokemonImageUrl}">
-	        </div>
+	        <canvas id="pokemon-icon_${cardId}" class="pokemon-icon">
+	        </canvas>
 	        ${typeEffectivenessHTML}
 	        
 	      </div>
@@ -338,6 +338,50 @@ function ivComparison(pokeIv, dexIv) {
     let returnHTML = `<div class="stat-icon" style="color: ${colorS} !important; opacity: 0.3">${iconA}</div>`
     return returnHTML;
 }
+
+function getPokemonIcon(pokemon, divId) {
+    const canvas = document.getElementById(`pokemon-icon_${divId}`);
+    const ctx = canvas.getContext('2d');
+    const parent = canvas.parentElement;
+    const image1 = new Image();
+    const image2 = new Image();
+
+    const loadImage = (image, src) => {
+        return new Promise((resolve, reject) => {
+            image.onload = () => resolve(image);
+            image.onerror = () => reject(new Error(`Failed to load image from ${src}`));
+            image.src = src;
+        });
+    };
+
+    const drawImages = () => {
+        const width = image1.width;
+        const height = image1.height;
+        const parentHeight = parent.clientHeight;
+        const canvasWidth = parentHeight * (width / height);
+
+        // Set canvas dimensions based on the parent's height to allow scaling
+        canvas.width = canvasWidth;
+        canvas.height = parentHeight;
+
+        if (pokemon.fusionId) {
+            ctx.drawImage(image1, 0, 0, width, height / 2, 0, 0, canvasWidth, parentHeight / 2);
+            ctx.drawImage(image2, 0, height / 2, width, height / 2, 0, parentHeight / 2, canvasWidth, parentHeight / 2);
+        } else {
+            ctx.drawImage(image1, 0, 0, width, height, 0, 0, canvasWidth, parentHeight);
+        }
+    };
+    const image1Src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    const image2Src = pokemon.fusionId ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.fusionId}.png` : null;
+    loadImage(image1, image1Src)
+        .then(() => image2Src ? loadImage(image2, image2Src) : null)
+        .then(drawImages)
+        .catch(error => console.error(error));
+}
+
+
+
+
 
 async function createPokemonCardDiv_minified(cardId, pokemon) {
     let savedData =  Utils.LocalStorage.getPlayerData();
@@ -447,6 +491,7 @@ async function createCardsDiv(divId, pokemon) {
   `;
        newDiv.insertAdjacentHTML("afterbegin", cardsHTML)
        document.body.appendChild(newDiv);
+       getPokemonIcon(pokemon, divId);
        if(cardObj.slider) {
            document.getElementById(cardObj.slider).addEventListener('input', changeOpacity)
        }
