@@ -1,0 +1,43 @@
+{
+    "name": "roguedex",
+    "version": "1.0.0",
+    "description": "## Description Rogue Dex is a browser extension that connects to Pokerogue and uses PokeAPI to show information about Pokemon weaknesses, immunities, and resistances for each round.",
+    "main": "",
+    "type": "module",
+    "scripts": {
+        "configure-husky": "npx husky init",
+        "prepare": "husky",
+        "format": "npm run format:jscss && npm run format:html",
+        "format:jscss": "npx prettier **/*.{js,jsx,json,ts,css,less,scss} --write",
+		"format:html": "js-beautify **/*.html --type html --replace --config .jsbeautifyrc",		
+        "check-format": "npx prettier **/*.{js,jsx,json,ts,css,less,scss} --check",
+        "test": "echo 'testing...'"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@eslint/compat": "^1.0.1",
+        "eslint": "^8.57.0",
+        "eslint-config-standard": "^17.1.0",
+        "husky": "^9.0.11",
+        "js-beautify": "^1.15.1",
+        "lint-staged": "^15.2.2",
+        "prettier": "^3.2.5"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "**/*.{js,jsx,json,ts}": [
+            "eslint . --fix",
+            "prettier --config .prettierrc . --write --ignore-unknown",
+            "git add"
+        ],
+        "**/*.{css,less,scss}": [
+            "prettier --config .prettierrc . --write --ignore-unknown",
+            "git add"
+        ]
+    }
+}
