@@ -1,5 +1,6 @@
 import { FlatCompat } from '@eslint/eslintrc'
 import { fixupConfigRules } from '@eslint/compat'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 const compat = new FlatCompat()
 
@@ -9,6 +10,7 @@ export default [
             extends: ['standard'],
         })
     ),
+	eslintConfigPrettier,
     {
         rules: {
             'no-undef': 'warn',
