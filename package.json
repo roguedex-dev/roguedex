@@ -1,0 +1,54 @@
+{
+	"name": "roguedex",
+	"version": "1.0.0",
+	"description": "RogueDex is a browser extension that shows information (type weaknesses, IVs etc) of enemy and ally Pokemon for the PokeRoGue game.",
+	"main": "",
+	"type": "module",
+	"scripts": {
+		"prepare": "husky",
+		"check-lint:code": "npx eslint \"**/*.{js,jsx,json,ts}\" --config eslint.config.mjs",
+		"check-format:code": "npx prettier \"**/*.{js,jsx,json,ts}\" --config .prettierrc --check",
+		"check-lint:style": "npx stylelint \"**/*.{css,less,scss}\" --config .stylelint.config.mjs",
+		"check-format:style": "npx prettier \"**/*.{css,less,scss}\" --config .prettierrc --check",
+		"check-format:html": "npx prettier \"**/*.{html,htm}\" --config .prettierrc --check",
+		"fix-lint:code": "npx eslint \"**/*.{js,jsx,json,ts}\" --config eslint.config.mjs --cache --fix",
+		"fix-lint:style": "npx stylelint \"**/*.{css,less,scss}\" --config .stylelint.config.mjs --cache --fix",
+		"format:code": "npx prettier \"**/*.{js,jsx,json,ts}\" --config .prettierrc --write --ignore-unknown",
+		"format:style": "npx prettier \"**/*.{css,less,scss}\" --config .prettierrc --write --ignore-unknown",
+		"format:html": "npx prettier \"**/*.{html,htm}\" --config .prettierrc --write --ignore-unknown",
+		"fix-lint:all": "npm run lint:code && npm run lint:style",
+		"fix:all": "npm run format:code && npm run format:style && npm run format:html"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@eslint/compat": "^1.0.1",
+		"eslint": "^8.57.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-config-standard": "^17.1.0",
+		"husky": "^9.0.11",
+		"prettier": "^3.2.5",
+		"stylelint": "^16.5.0"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"**/*.{js,jsx,json,ts}": [
+			"eslint --config eslint.config.mjs --cache --fix",
+			"prettier --config .prettierrc --write --ignore-unknown",
+			"git add"
+		],
+		"**/*.{css,less,scss}": [
+			"stylelint --config .stylelint.config.mjs --cache --fix",
+			"prettier --config .prettierrc --write --ignore-unknown",
+			"git add"
+		],
+		"**/*.{html,htm}": [
+			"prettier --config .prettierrc --write --ignore-unknown",
+			"git add"
+		]
+	}
+}

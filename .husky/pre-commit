@@ -1,0 +1,8 @@
+# .husky/pre-commit
+
+# Your WIP script
+# ...
+
+npx lint-staged
+
+# exit 1 # fails the commit, good for testing

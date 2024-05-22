@@ -1,181 +1,188 @@
 :root {
-  --font-size: min(3vh, 2vw);
-  --icon-size: min(10vh, 6vw);
+    --font-size: min(3vh, 2vw);
+    --icon-size: min(10vh, 6vw);
 }
 
 .allies-team {
-  margin: 0 auto;
-  padding: 0 auto;
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
-  display: flex;
+    margin: 0 auto;
+    padding: 0 auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    display: flex;
 }
 
 .enemy-team {
-  margin: 0 auto;
-  padding: 0 auto;
-  position: absolute;
-  top: 0;
-  z-index: 1;
-  display: flex;
+    margin: 0 auto;
+    padding: 0 auto;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    display: flex;
 }
 
 .pokemon-cards {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 
 .pokemon-card {
-  background-color: #333333b8;
-  border: 2px solid #555;
-  border-radius: 8px;
-  flex: 0 0 auto;
-  display:flex;
-  flex-direction: column;
+    background-color: #333333b8;
+    border: 2px solid #555;
+    border-radius: 8px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .pokemon-icon img {
-  width: min(var(--icon-size), 100px);
-  height: min(var(--icon-size), 100px);
+    width: min(var(--icon-size), 100px);
+    height: min(var(--icon-size), 100px);
 }
 
 .pokemon-info {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 .pokemon-types {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
 .type-icon {
-  --width: min(calc(var(--icon-size) / 2), 30px);
-  --height: min(calc(var(--icon-size) / 2), 30px);
-  width: var(--width);
-  height: var(--height);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: left;
-  background-position-x: min(-0.03em, -1.15px);
-  border-radius: 50%;
-  margin: 0 5px;
+    --width: min(calc(var(--icon-size) / 2), 30px);
+    --height: min(calc(var(--icon-size) / 2), 30px);
+    width: var(--width);
+    height: var(--height);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left;
+    background-position-x: min(-0.03em, -1.15px);
+    border-radius: 50%;
+    margin: 0 5px;
 }
 
 .pokemon-weaknesses,
 .pokemon-resistances,
 .pokemon-immunities {
-  min-width: min(calc(var(--icon-size) / 2 + 1vh), 30px);
-  display: flex;
-  justify-content: center;
+    min-width: min(calc(var(--icon-size) / 2 + 1vh), 30px);
+    display: flex;
+    justify-content: center;
 }
 
 .pokemon-weaknesses {
-  background-color: #6a1f1f;
-  border: 2px solid red;
-  border-radius: 10px;
+    background-color: #6a1f1f;
+    border: 2px solid red;
+    border-radius: 10px;
 }
 
 .pokemon-resistances {
-  background-color: #216a1f;
-  border: 2px solid green;
-  border-radius: 10px;
+    background-color: #216a1f;
+    border: 2px solid green;
+    border-radius: 10px;
 }
 
 .pokemon-immunities {
-  background-color: #484848;
-  border: 2px solid white;
-  border-radius: 10px;
+    background-color: #484848;
+    border: 2px solid white;
+    border-radius: 10px;
 }
 
 .pokemon-weaknesses .type-icon,
 .pokemon-resistances .type-icon,
 .pokemon-immunities .type-icon {
-  opacity: 1;
+    opacity: 1;
 }
 
 .text-base {
-  display: flex;
-  font-family: 'emerald';
-  font-size: min(var(--font-size), 18px);
-  text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
-  color: black;
+    display: flex;
+    font-family: 'emerald';
+    font-size: min(var(--font-size), 18px);
+    text-shadow:
+        2px 0 #fff,
+        -2px 0 #fff,
+        0 2px #fff,
+        0 -2px #fff,
+        1px 1px #fff,
+        -1px -1px #fff,
+        1px -1px #fff,
+        -1px 1px #fff;
+    color: black;
 }
 
 .arrow-button-wrapper {
-  display: grid;
+    display: grid;
 }
 .arrow-button {
-  font-size: min(8vh, 3vw)
+    font-size: min(8vh, 3vw);
 }
 
 .tooltip .tooltiptext {
-  visibility: hidden;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  font-size: var(--font-size);
-  position: absolute;
-  z-index: 1;
-  background-color: #fff;
-  max-width: 12vw;
+    visibility: hidden;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    font-size: var(--font-size);
+    position: absolute;
+    z-index: 1;
+    background-color: #fff;
+    max-width: 12vw;
 }
 
 .tooltip:hover .tooltiptext {
-  visibility: visible;
+    visibility: visible;
 }
 
 /* Slider settings */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
     input[type='range'] {
-      overflow: hidden;
-      width: min(20vh, 7.5vw);
-      -webkit-appearance: none;
-    }
-    
-    input[type='range']::-webkit-slider-runnable-track {
-      height: 1vh;
-      -webkit-appearance: none;
-      color: #13bba4;
-      margin-top: -1px;
-    }
-    
-    input[type='range']::-webkit-slider-thumb {
-      width: 1vh;
-      -webkit-appearance: none;
-      height: 1vh;
-      cursor: ew-resize;
-      box-shadow: -8vh 0 0 8vh #b3462c;
+        overflow: hidden;
+        width: min(20vh, 7.5vw);
+        -webkit-appearance: none;
     }
 
+    input[type='range']::-webkit-slider-runnable-track {
+        height: 1vh;
+        -webkit-appearance: none;
+        color: #13bba4;
+        margin-top: -1px;
+    }
+
+    input[type='range']::-webkit-slider-thumb {
+        width: 1vh;
+        -webkit-appearance: none;
+        height: 1vh;
+        cursor: ew-resize;
+        box-shadow: -8vh 0 0 8vh #b3462c;
+    }
 }
 /** FF*/
-input[type="range"]::-moz-range-progress {
-  background-color: #b3462c;
+input[type='range']::-moz-range-progress {
+    background-color: #b3462c;
 }
-input[type="range"]::-moz-range-track {  
-  background-color: #fff;
+input[type='range']::-moz-range-track {
+    background-color: #fff;
 }
-input[type="range"] {
-  background-color:transparent
+input[type='range'] {
+    background-color: transparent;
 }
 
 .slider-wrapper {
-  display: flex;
+    display: flex;
 }
 
 .running-status {
-  position: absolute;
-  width: 100%;
-  justify-content: center;
-  text-align: center;
-  color: blue;
-  background-color: #ffffff50;
+    position: absolute;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    color: blue;
+    background-color: #ffffff50;
 }
 
 .hidden-ability {
-  color: #f700ff;
+    color: #f700ff;
 }
