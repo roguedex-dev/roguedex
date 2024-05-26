@@ -1,0 +1,28 @@
+var Nature;
+(function (Nature) {
+    Nature[Nature["HARDY"] = 0] = "HARDY";
+    Nature[Nature["LONELY"] = 1] = "LONELY";
+    Nature[Nature["BRAVE"] = 2] = "BRAVE";
+    Nature[Nature["ADAMANT"] = 3] = "ADAMANT";
+    Nature[Nature["NAUGHTY"] = 4] = "NAUGHTY";
+    Nature[Nature["BOLD"] = 5] = "BOLD";
+    Nature[Nature["DOCILE"] = 6] = "DOCILE";
+    Nature[Nature["RELAXED"] = 7] = "RELAXED";
+    Nature[Nature["IMPISH"] = 8] = "IMPISH";
+    Nature[Nature["LAX"] = 9] = "LAX";
+    Nature[Nature["TIMID"] = 10] = "TIMID";
+    Nature[Nature["HASTY"] = 11] = "HASTY";
+    Nature[Nature["SERIOUS"] = 12] = "SERIOUS";
+    Nature[Nature["JOLLY"] = 13] = "JOLLY";
+    Nature[Nature["NAIVE"] = 14] = "NAIVE";
+    Nature[Nature["MODEST"] = 15] = "MODEST";
+    Nature[Nature["MILD"] = 16] = "MILD";
+    Nature[Nature["QUIET"] = 17] = "QUIET";
+    Nature[Nature["BASHFUL"] = 18] = "BASHFUL";
+    Nature[Nature["RASH"] = 19] = "RASH";
+    Nature[Nature["CALM"] = 20] = "CALM";
+    Nature[Nature["GENTLE"] = 21] = "GENTLE";
+    Nature[Nature["SASSY"] = 22] = "SASSY";
+    Nature[Nature["CAREFUL"] = 23] = "CAREFUL";
+    Nature[Nature["QUIRKY"] = 24] = "QUIRKY";
+})(Nature || (Nature = {}));

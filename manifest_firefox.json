@@ -14,7 +14,15 @@
     }
   },
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "background.js",
+      "libs/pokeapi.js",
+      "libs/pokerogueutils.js",
+      "libs/utils.js",
+      "libs/enums/Nature.js",
+      "libs/enums/Stat.js",
+      "libs/enums/WeatherType.js"
+    ],
     "persistent": true
   },
   "content_scripts": [

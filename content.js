@@ -293,8 +293,8 @@ function createPokemonCardDiv(cardclass, cardId, pokemon) {
 	        </div>
 	        &nbsp-&nbsp 
 	        <div class = "tooltip">
-	        	Nature: ${pokemon.nature}
-	        	${createTooltipDiv("")}
+	        	Nature: ${pokemon.nature.name}
+	        	${createTooltipDiv(pokemon.nature.description)}
 	        </div>
 	      </div>
 	      <div class="text-base">
