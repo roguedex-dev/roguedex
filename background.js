@@ -13,10 +13,17 @@ function updateDiv(pokemon, weather, message) {
   });
 }
 
+function sortById(a, b) {
+  if (a.id > b.id) return 1
+  else if (a.id < b.id) return -1
+  else return 0
+}
+
 // message can be either "UPDATE_ALLIES_DIV" or "UPDATE_ENEMIES_DIV"
 function appendPokemonArrayToDiv(pokemonArray, arena, message) {
   let frontendPokemonArray = []
-  pokemonArray.forEach((pokemon) => {
+  let itemsProcessed = 0;
+  pokemonArray.forEach((pokemon, index, array) => {
     const pokemonId = Utils.convertPokemonId(pokemon.species)
     let weather = {}
     if (arena.weather && arena.weather.weatherType) {
@@ -42,7 +49,9 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
               description: PokeRogueUtils.getNatureDescription(pokemon.nature)
             }
           })
-          updateDiv(frontendPokemonArray, weather, message)
+          itemsProcessed++;
+          if (itemsProcessed === array.length)
+            updateDiv(frontendPokemonArray.sort(sortById), weather, message)
         })
     })
   })

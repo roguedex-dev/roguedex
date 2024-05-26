@@ -387,7 +387,6 @@ function deleteWrapperDivs() {
 	} catch (e) {
 		console.error(e)
 	}
-	
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -398,11 +397,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		slotId = message.slotId
 		if ( uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponse({ success: true })
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
+
 		if (message.type === 'UPDATE_ENEMIES_DIV') {
-			enemiesPokemon = message.pokemon
+			if (!_.isEqual(enemiesPokemon, message.pokemon))
+				enemiesPokemon = message.pokemon
 		}
 		else {
-			alliesPokemon = message.pokemon
+			if (!_.isEqual(alliesPokemon, message.pokemon))
+				alliesPokemon = message.pokemon
 		}
 		weather = message.weather;
 		if (weather.turnsLeft === 0) weather.turnsLeft = 'N/A'

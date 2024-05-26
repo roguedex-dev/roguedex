@@ -38,7 +38,8 @@
       "matches": ["https://pokerogue.net/*"],
       "js" : [
         "content.js", 
-        "libs/crypto-js.min.js"
+        "libs/crypto-js.min.js",
+        "libs/lodash.js"
       ],
       "css": ["styles.css"]
     }
