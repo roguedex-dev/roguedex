@@ -274,7 +274,7 @@ function appendPokemonArrayToDiv(pokemonArray, arena, message) {
         getPokemonTypeEffectiveness(pokemonId).then((typeEffectiveness) => { 
           console.log("Got pokemon", pokemonId, "ability", ability, "type effectiveness", typeEffectiveness)
           frontendPokemonArray.push({
-            'id': pokemon.species,
+            'id': pokemonId,
             'typeEffectiveness': {
               'weaknesses': Array.from(typeEffectiveness.weaknesses), 
               'resistances': Array.from(typeEffectiveness.resistances), 
