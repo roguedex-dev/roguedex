@@ -5,6 +5,7 @@
   "permissions": [
     "activeTab",
     "webRequest",
+    "storage",
     "https://pokerogue.net/*",
     "https://api.pokerogue.net/*"
   ],
@@ -29,7 +30,13 @@
     {
       "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
       "js" : [
-        "inject.js"
+        "inject.js",
+        "libs/lodash.js",
+        "libs/localstorageutils.js",
+        "libs/httputils.js",
+        "libs/httpjsutils.js",
+        "libs/enums/Stat.js",
+        "libs/enums/Types.js"
       ],
       "run_at": "document_start",
       "all_frames": true
@@ -38,8 +45,7 @@
       "matches": ["https://pokerogue.net/*"],
       "js" : [
         "content.js", 
-        "libs/crypto-js.min.js",
-        "libs/lodash.js"
+        "libs/crypto-js.min.js"
       ],
       "css": ["styles.css"]
     }

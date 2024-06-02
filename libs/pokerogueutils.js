@@ -87,11 +87,11 @@ class PokeRogueUtils {
 	            decreasedStat = stat;
 	    }
 	    if (increasedStat && decreasedStat)
-	        ret = `+(${Stat[increasedStat]})/-(${Stat[decreasedStat]})`;
+	        ret = `(+${Stat[increasedStat]}/-${Stat[decreasedStat]})`;
 	    else if (increasedStat)
-	        ret = `+(${Stat[increasedStat]})`;
+	        ret = `(+${Stat[increasedStat]})`;
 	    else if (decreasedStat)
-	        ret = `-(${Stat[decreasedStat]})`;
+	        ret = `(-${Stat[decreasedStat]})`;
 	    return ret;
 	}
 }

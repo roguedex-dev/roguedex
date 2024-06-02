@@ -8,12 +8,18 @@
     "https://api.pokerogue.net/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "service_worker.js"
   },
   "content_scripts": [
     {
       "matches": ["https://api.pokerogue.net/*", "https://pokerogue.net/*"],
-      "js": ["inject.js"],
+      "js": ["inject.js",
+        "libs/lodash.js",
+        "libs/localstorageutils.js",
+        "libs/httputils.js",
+        "libs/httpjsutils.js",
+        "libs/enums/Stat.js",
+        "libs/enums/Types.js"],
       "run_at": "document_start",
       "all_frames": true
     },

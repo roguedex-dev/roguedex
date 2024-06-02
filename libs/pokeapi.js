@@ -24,9 +24,10 @@ class PokeApi {
 	    const abilityName = data.abilities[abilityIndex].ability.name
 	    const abilityInfo = await fetch(`https://pokeapi.co/api/v2/ability/${abilityName}`);
 	    const abilityData = await abilityInfo.json();
+	    const description = abilityData.flavor_text_entries.find((entry) => entry.language.name === "en") || "No description found"
 	    return {
 	        'name': abilityName.toUpperCase().replace('-', ' '),
-	        'description': abilityData.flavor_text_entries[abilityData.flavor_text_entries.length - 1].flavor_text,
+	        'description': description.flavor_text,
 	        'isHidden': data.abilities[abilityIndex].is_hidden
 	    }
 	  } catch (error) {

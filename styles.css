@@ -1,8 +1,53 @@
 :root {
   --font-size: min(3vh, 2vw);
-  --icon-size: min(10vh, 6vw);
+  --font-size-sm: min(3vh, 3vw);
+  --font-size-m: min(2vh, 2vw);
+  --font-size-l: min(2vh, 3vw);
+  --font-size-xl: min(3vh, 3vw);
+  --arrow-font-size: calc(var(--font-size) * 2);
+  --pkm-icon-size: min(10vh, 6vw);
+  --pkm-icon-size-sm: min(15vh, 12vw);
+  --pkm-icon-size-m: min(10vh, 12vw);
+  --pkm-icon-size-l: min(12vh, 12vw);
+  --pkm-icon-size-xl: min(12vh, 12vw);
+  --type-icon-size: min(5vh, 3vw);
+  --type-icon-size-sm: min(5vh, 5vw);
+  --type-icon-size-m: min(4vh, 4vw);
+  --type-icon-size-l: min(3vh, 4vw);
+  --type-icon-size-xl: min(4vh, 5vw);
 }
 
+@media only screen and (min-width: 0px) {
+  :root {
+    --font-size: var(--font-size-sm);
+    --pkm-icon-size: var(--pkm-icon-size-sm);
+    --type-icon-size: var(--type-icon-size-sm);
+  }
+}
+
+@media only screen and (min-width: 720px) {
+  :root {
+    --font-size: var(--font-size-m);
+    --pkm-icon-size: var(--pkm-icon-size-m);
+    --type-icon-size: var(--type-icon-size-m);
+  }
+}
+
+@media only screen and (min-width: 2560px) {
+  :root {
+    --font-size: var(--font-size-l);
+    --pkm-icon-size: var(--pkm-icon-size-l);
+    --type-icon-size: var(--type-icon-size-l);
+  }
+}
+
+@media only screen and (min-width: 5120px) {
+  :root {
+    --font-size: var(--font-size-xl);
+    --pkm-icon-size: var(--pkm-icon-size-xl);
+    --type-icon-size: var(--type-icon-size-xl);
+  }
+}
 .allies-team {
   margin: 0 auto;
   padding: 0 auto;
@@ -13,7 +58,7 @@
   display: flex;
 }
 
-.enemy-team {
+.enemies-team {
   margin: 0 auto;
   padding: 0 auto;
   position: absolute;
@@ -38,8 +83,8 @@
 }
 
 .pokemon-icon img {
-  width: min(var(--icon-size), 100px);
-  height: min(var(--icon-size), 100px);
+  width: var(--pkm-icon-size);
+  height: var(--pkm-icon-size);
 }
 
 .pokemon-info {
@@ -53,8 +98,8 @@
 }
 
 .type-icon {
-  --width: min(calc(var(--icon-size) / 2), 30px);
-  --height: min(calc(var(--icon-size) / 2), 30px);
+  --width: var(--type-icon-size);
+  --height: var(--type-icon-size);
   width: var(--width);
   height: var(--height);
   background-size: cover;
@@ -68,7 +113,7 @@
 .pokemon-weaknesses,
 .pokemon-resistances,
 .pokemon-immunities {
-  min-width: min(calc(var(--icon-size) / 2 + 1vh), 30px);
+  min-width: var(--type-icon-size);
   display: flex;
   justify-content: center;
 }
@@ -100,7 +145,7 @@
 .text-base {
   display: flex;
   font-family: 'emerald';
-  font-size: min(var(--font-size), 18px);
+  font-size: var(--font-size);
   text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
   color: black;
 }
@@ -109,7 +154,7 @@
   display: grid;
 }
 .arrow-button {
-  font-size: min(8vh, 3vw)
+  font-size: var(--arrow-font-size);
 }
 
 .tooltip .tooltiptext {
@@ -132,7 +177,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input[type='range'] {
       overflow: hidden;
-      width: min(20vh, 7.5vw);
+      width: 100%;
       -webkit-appearance: none;
     }
     
