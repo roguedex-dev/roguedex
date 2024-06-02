@@ -50,16 +50,15 @@ function _enableDragElement(elmnt) {
   const dragStartElement = elmnt;
 
   // Attach the mousedown event handler
-  dragStartElement.onmousedown = dragMouseDown;
-
+  dragStartElement.onpointerdown = dragMouseDown;
   function dragMouseDown(e) {
     e = e || window.event;
     if (e.target.type === 'submit' || e.target.type === 'range') return
     e.preventDefault();
     pos3 = e.clientX;
     pos4 = e.clientY;
-    document.onmouseup = stopDragging;
-    document.onmousemove = dragElement;
+    document.onpointerup = stopDragging;
+    document.onpointermove = dragElement;
   }
 
   // Handles dragging movement
@@ -77,7 +76,7 @@ function _enableDragElement(elmnt) {
 
   // Stops dragging on mouse release
   function stopDragging() {
-    document.onmouseup = null;
-    document.onmousemove = null;
+    document.onpointerup = null;
+    document.onpointermove = null;
   }
 }
