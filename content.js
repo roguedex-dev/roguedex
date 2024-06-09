@@ -8,6 +8,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	console.log("Current ui mode: ", uiMode)
 	if (message.type === 'UPDATE_ENEMIES_DIV' || message.type === 'UPDATE_ALLIES_DIV') {
 		LocalStorageUtils.slotId = message.slotId
+		if (uiMode === 'SAVE_SLOT') LocalStorageUtils.cleanSessionData()
 		if (uiMode === 'TITLE' || uiMode === 'SAVE_SLOT') return sendResponse({ success: true })
 
 		let divId = message.type === 'UPDATE_ENEMIES_DIV' ? 'enemies' : 'allies'
@@ -30,9 +31,6 @@ if (touchControlsElement) {
 					data: LocalStorageUtils.getCurrentSessionData(localStorage), 
 					slotId: LocalStorageUtils.slotId 
 				})
-			}
-			else if(newValue === "SAVE_SLOT") {
-				setTimeout(LocalStorageUtils.cleanSessionData, 1000)
 			}
 			else {
 				HttpUtils.deleteWrapperDivs()

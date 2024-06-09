@@ -15,8 +15,15 @@ class LocalStorageUtils {
 	}
 
 	static cleanSessionData() {
-		for (key in localStorage) {
-          if (key.includes('sessionData')) localStorage.removeItem(key)
-        }
+		let removeKeys = []
+		Object.keys(localStorage).some((key) => {
+			if (key.includes('sessionData'))
+				removeKeys.push(key)
+		})
+		console.log("Found the following keys in localStorage:", removeKeys)
+		Object.keys(removeKeys).some((key) => {
+			console.log("Removing key", removeKeys[key])
+			localStorage.removeItem(removeKeys[key])
+		})
 	}
 }
