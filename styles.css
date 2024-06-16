@@ -224,3 +224,7 @@ input[type="range"] {
 .hidden-ability {
   color: #f700ff;
 }
+
+input {
+  font-size: var(--font-size);
+}
