@@ -8,7 +8,6 @@ class LocalStorageUtils {
 		Object.keys(localStorage).some((key) => {
 			if ((this.slotId > 0 && key.includes(`sessionData${this.slotId}`)) || key.includes('sessionData')) {
 				currentSessionData = localStorage.getItem(key)
-				return true
 			}
 		})
 		return JSON.parse(CryptoJS.AES.decrypt(currentSessionData, saveKey).toString(CryptoJS.enc.Utf8))
@@ -25,5 +24,6 @@ class LocalStorageUtils {
 			console.log("Removing key", removeKeys[key])
 			localStorage.removeItem(removeKeys[key])
 		})
+		return removeKeys.length > 0
 	}
 }

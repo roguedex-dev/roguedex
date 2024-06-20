@@ -31,8 +31,11 @@ if (touchControlsElement) {
 					data: LocalStorageUtils.getCurrentSessionData(localStorage), 
 					slotId: LocalStorageUtils.slotId 
 				})
-			}
-			else {
+			} else {
+				if (newValue === "SAVE_SLOT") {
+					//TODO: Perhaps observe changes in local storage?
+					setTimeout(LocalStorageUtils.cleanSessionData, 1000)
+				}
 				HttpUtils.deleteWrapperDivs()
 			}
 		});
