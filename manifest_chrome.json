@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Rogue Dex",
-  "version": "2.8.2",
+  "version": "2.8.3",
   "permissions": ["activeTab", "webRequest"],
   "host_permissions": [
     "https://pokerogue.net/*",
