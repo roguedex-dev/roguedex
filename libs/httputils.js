@@ -210,6 +210,7 @@ class HttpUtils {
 
 	static createCardsDiv(divId) {
 	  let newDiv = _createWrapperDiv(divId)
+	  _loadPositions()
 	  let pokemon = {}
 	  if (divId === 'enemies') {
 	  	if (_currentEnemyPage >= _enemiesPokemon.length) _currentEnemyPage = 0

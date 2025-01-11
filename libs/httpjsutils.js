@@ -39,7 +39,91 @@ function _changePage(click) {
 		}
 	}
 	HttpUtils.createCardsDiv(divId)
+
 }
+/**
+ * Function to save the positions of the enemy and ally teams to localStorage
+ */
+function _savePositions() {  
+  console.log("Saving positions to localStorage");
+  // Get the enemy and ally divs
+  const enemiesDiv = document.getElementById('enemies');
+  const alliesDiv = document.getElementById('allies');
+  
+  // Get the position coordinates of enemy and ally teams
+  const enemiesPosition = {
+    top: enemiesDiv.style.top,
+    left: enemiesDiv.style.left
+  };
+  const alliesPosition = {
+    top: alliesDiv.style.top,
+    left: alliesDiv.style.left
+  };
+  
+  // Save the coordinates to localStorage
+  localStorage.setItem('enemiesPosition', JSON.stringify(enemiesPosition));
+  localStorage.setItem('alliesPosition', JSON.stringify(alliesPosition));
+}
+  
+  
+/**
+ * Function to load the positions of the enemy and ally teams from localStorage
+ */
+function _loadPositions() {
+  console.log("Loading positions from localStorage");
+  // Get the saved coordinates from localStorage
+  const enemiesPosition = JSON.parse(localStorage.getItem('enemiesPosition'));
+  const alliesPosition = JSON.parse(localStorage.getItem('alliesPosition'));
+
+  // Get the enemy and ally divs
+  const enemiesDiv = document.getElementById('enemies');
+  const alliesDiv = document.getElementById('allies');
+
+  // Check if positions are available in localStorage
+  if (enemiesPosition) {
+    
+    // ensure that the elements are actually visible (i.e. in the viewport)
+    const allyTop = parseInt(alliesPosition.top.replace("px", ""))
+    const allyLeft = parseInt(alliesPosition.left.replace("px", ""))
+    const enemyTop = parseInt(enemiesPosition.top.replace("px", ""))
+    const enemyLeft = parseInt(enemiesPosition.left.replace("px", ""))
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    // if there are invalid positions, reset them by unsetting the localStorage and re-calling this function
+    if (
+      allyTop > windowHeight || 
+      allyLeft > windowWidth ||
+      enemyTop > windowHeight || 
+      enemyLeft > windowWidth
+    ){ 
+      localStorage.removeItem('alliesPosition');
+      localStorage.removeItem('enemiesPosition');
+      _loadPositions();
+      return;
+    }    
+
+    // Set the enemy team position based on the last saved position
+    enemiesDiv.style.top = enemiesPosition.top || "0px";
+    enemiesDiv.style.left = enemiesPosition.left || "0px";
+  } else {
+    // If there is no saved position for enemies, set them to "0px"
+    enemiesDiv.style.top = "0px";
+    enemiesDiv.style.left = "0px";
+  }
+  
+  if (alliesPosition) {
+    // Set ally team position based on the last saved position
+    alliesDiv.style.top = alliesPosition.top || "0px";
+    alliesDiv.style.left = alliesPosition.left || "0px";
+  } else {
+    // If there is no saved position for allies, position them below enemies
+    const enemyHeight = enemiesDiv.offsetHeight || 0;
+    alliesDiv.style.top = `${enemyHeight}px`;
+    alliesDiv.style.left = "0px";
+  }
+}
+
+let isDragging = false;
 
 // Enables drag-and-drop functionality on an element
 function _enableDragElement(elmnt) {
@@ -59,6 +143,7 @@ function _enableDragElement(elmnt) {
     pos4 = e.clientY;
     document.onpointerup = stopDragging;
     document.onpointermove = dragElement;
+    isDragging = true;
   }
 
   // Handles dragging movement
@@ -78,5 +163,7 @@ function _enableDragElement(elmnt) {
   function stopDragging() {
     document.onpointerup = null;
     document.onpointermove = null;
+    isDragging = false;
+    _savePositions();
   }
 }
