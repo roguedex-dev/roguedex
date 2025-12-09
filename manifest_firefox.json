@@ -7,7 +7,10 @@
     "webRequest",
     "storage",
     "https://pokerogue.net/*",
-    "https://api.pokerogue.net/*"
+    "https://api.pokerogue.net/*",
+    "https://*pokerogue*/*",
+    "https://*api.pokerogue*/*",
+    "https://*rogueserver*/*"
   ],
   "browser_specific_settings": {
     "gecko": {
